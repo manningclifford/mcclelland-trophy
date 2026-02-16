@@ -27,3 +27,8 @@ yarn-error.log*
 
 # Local development
 *.local
+
+# Server cache
+server/cache.db
+server/worm_cache.json
+server/node_modules/
