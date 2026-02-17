@@ -11,7 +11,7 @@ const FEATURES = [
   {
     path: '/ladder-closeness',
     title: 'Ladder Closeness',
-    description: 'Which seasons went down to the wire? Rank every McClelland Trophy race by how tight the competition was from top to bottom.',
+    description: 'Which seasons went down to the wire? Rank every AFL, AFLW, and combined season by how tight the ladder was from top to bottom.',
     gradient: 'from-emerald-600 via-green-500 to-emerald-700',
     icon: '\uD83D\uDCCA',
   },

@@ -192,7 +192,7 @@ function App() {
         <>
           <div className="bg-emerald-50 border-b border-emerald-200">
             <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-emerald-800 font-medium">
-              <strong>How it works:</strong> Each season is scored on how tight the McClelland Trophy race was — factoring in the gap at the top, points spread, and overall equality.
+              <strong>How it works:</strong> Each season is scored on how tight the ladder was — factoring in the gap at the top, points spread, and overall equality across AFL, AFLW, or combined.
             </div>
           </div>
 
@@ -201,7 +201,7 @@ function App() {
 
             <footer className="mt-8 text-center text-sm text-gray-500">
               <p>
-                Closeness analysis based on McClelland Trophy standings data from 2017 to 2025.
+                Closeness analysis based on AFL ladder data from 1997 to 2025, AFLW from 2017 to 2025.
               </p>
             </footer>
           </main>
