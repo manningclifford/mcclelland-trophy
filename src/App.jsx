@@ -4,6 +4,7 @@ import HomePage from './components/HomePage';
 import SeasonSelector from './components/SeasonSelector';
 import LadderTable from './components/LadderTable';
 import Summary from './components/Summary';
+import LadderCloseness from './components/LadderCloseness';
 import WormSimilarity from './components/worm/WormSimilarity';
 import { getMcClellandStandings, clearCache } from './services/aflApi';
 import { historicalData } from './data/historical';
@@ -76,19 +77,19 @@ function App() {
   const aflwTeams = historicalData[selectedYear]?.aflwTeams;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen footy-bg">
       <Header route={route} onNavigate={navigate} />
 
       {route === '/' && (
-        <main className="max-w-6xl mx-auto py-8 px-4">
+        <main className="max-w-6xl mx-auto py-10 px-4">
           <HomePage onNavigate={navigate} />
         </main>
       )}
 
       {route === '/mcclelland' && (
         <>
-          <div className="bg-blue-50 border-b border-blue-100">
-            <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-blue-700">
+          <div className="bg-emerald-50 border-b border-emerald-200">
+            <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-emerald-800 font-medium">
               <strong>Points System (2023-2024):</strong> AFL Win = 4pts, AFLW Win = 8pts | Draws = half points | Tiebreaker: Combined percentage
             </div>
           </div>
@@ -98,9 +99,9 @@ function App() {
               <nav className="flex gap-1">
                 <button
                   onClick={() => setView('ladder')}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                  className={`px-6 py-3 font-bold text-sm border-b-2 transition-colors ${
                     view === 'ladder'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -108,9 +109,9 @@ function App() {
                 </button>
                 <button
                   onClick={() => setView('summary')}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                  className={`px-6 py-3 font-bold text-sm border-b-2 transition-colors ${
                     view === 'summary'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -131,25 +132,25 @@ function App() {
                   />
 
                   {historicalWinner && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-sm">
-                      <span className="text-yellow-700">
-                        🏆 {selectedYear} Winner: <strong>{historicalWinner}</strong>
+                    <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-2 text-sm">
+                      <span className="text-amber-800">
+                        {selectedYear} Winner: <strong>{historicalWinner}</strong>
                       </span>
                     </div>
                   )}
 
                   {hypotheticalWinner && !historicalWinner && (
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg px-4 py-2 text-sm">
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl px-4 py-2 text-sm">
                       <span className="text-purple-700">
-                        📊 {selectedYear} Hypothetical Leader: <strong>{hypotheticalWinner}</strong>
+                        {selectedYear} Hypothetical Leader: <strong>{hypotheticalWinner}</strong>
                         <span className="text-purple-500 text-xs ml-2">(Trophy not yet awarded)</span>
                       </span>
                     </div>
                   )}
 
                   {selectedYear >= CURRENT_YEAR && !historicalWinner && !hypotheticalWinner && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm">
-                      <span className="text-blue-700">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 text-sm">
+                      <span className="text-emerald-700 font-medium">
                         Season in progress
                       </span>
                     </div>
@@ -157,7 +158,7 @@ function App() {
                 </div>
 
                 {aflwTeams && aflwTeams !== 'all' && (
-                  <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 text-sm text-orange-700">
+                  <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl px-4 py-2 text-sm text-orange-700">
                     <strong>Note:</strong> In {selectedYear}, only {aflwTeams.length} teams had AFLW sides.
                     Teams without AFLW programs only earn AFL points.
                   </div>
@@ -187,10 +188,30 @@ function App() {
         </>
       )}
 
+      {route === '/ladder-closeness' && (
+        <>
+          <div className="bg-emerald-50 border-b border-emerald-200">
+            <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-emerald-800 font-medium">
+              <strong>How it works:</strong> Each season is scored on how tight the McClelland Trophy race was — factoring in the gap at the top, points spread, and overall equality.
+            </div>
+          </div>
+
+          <main className="max-w-6xl mx-auto py-8 px-4">
+            <LadderCloseness />
+
+            <footer className="mt-8 text-center text-sm text-gray-500">
+              <p>
+                Closeness analysis based on McClelland Trophy standings data from 2017 to 2025.
+              </p>
+            </footer>
+          </main>
+        </>
+      )}
+
       {route === '/worm-similarity' && (
         <>
-          <div className="bg-blue-50 border-b border-blue-100">
-            <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-blue-700">
+          <div className="bg-emerald-50 border-b border-emerald-200">
+            <div className="max-w-6xl mx-auto px-4 py-2 text-xs text-emerald-800 font-medium">
               <strong>How it works:</strong> Each worm is normalised by its peak margin, then compared minute-by-minute. Lower similarity score = closer match.
             </div>
           </div>
@@ -200,9 +221,9 @@ function App() {
               <nav className="flex gap-1">
                 <button
                   onClick={() => setWormView('search')}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                  className={`px-6 py-3 font-bold text-sm border-b-2 transition-colors ${
                     wormView === 'search'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -210,9 +231,9 @@ function App() {
                 </button>
                 <button
                   onClick={() => setWormView('list')}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                  className={`px-6 py-3 font-bold text-sm border-b-2 transition-colors ${
                     wormView === 'list'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-emerald-600 text-emerald-700'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >

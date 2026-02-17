@@ -30,5 +30,5 @@ yarn-error.log*
 
 # Server cache
 server/cache.db
-server/worm_cache.json
+# server/worm_cache.json  # Needed for Railway deployment
 server/node_modules/
