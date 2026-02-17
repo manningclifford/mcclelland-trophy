@@ -108,27 +108,12 @@ export default function Summary() {
     <div className="space-y-8">
       {/* Introduction */}
       <section className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Why the McClelland Trophy Matters</h2>
-        <div className="prose prose-gray max-w-none text-gray-600 space-y-3">
-          <p>
-            The McClelland Trophy represents something unique in Australian sport: a measure of
-            <strong> total club excellence</strong> across both men's and women's football. While
-            premierships capture a moment of glory, this trophy asks a deeper question — which club
-            is genuinely committed to success across their entire program?
-          </p>
-          <p>
-            Named after AFL Commission member Andrew McClelland, the trophy was first awarded in 2023,
-            but we've calculated hypothetical winners back to 2017 when AFLW began. The results reveal
-            fascinating stories: clubs like North Melbourne and Adelaide whose AFLW dominance compensates
-            for AFL struggles, and clubs like Brisbane and Melbourne who've achieved the rare feat of
-            excellence in both competitions simultaneously.
-          </p>
-          <p>
-            In an era where women's sport is finally receiving the recognition it deserves, the McClelland
-            Trophy stands as a statement that both programs matter equally. A club can't win by neglecting
-            half their playing list. That's worth celebrating — and documenting.
-          </p>
-        </div>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">The McClelland Trophy</h2>
+        <p className="text-gray-600">
+          Awarded annually since 2023 to the AFL club with the best combined record across both AFL and AFLW.
+          AFL wins earn 4 points, AFLW wins earn 8 points (reflecting the shorter season), and draws earn half.
+          We've also calculated hypothetical winners back to 2017 when AFLW began.
+        </p>
       </section>
 
       {/* Trophy History */}
