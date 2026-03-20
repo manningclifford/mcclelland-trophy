@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { historicalData, calculateLegacyPoints, calculateCombinedPercentage } from '../data/historical';
 import { extendedAflData } from '../data/aflHistory';
 import { getTeamInfo } from '../data/teams';
+import TeamLogo from './TeamLogo';
 
 // Merge historical (2017+) with extended AFL data (1997-2016)
 const allData = { ...extendedAflData, ...historicalData };
@@ -235,7 +236,7 @@ export default function LadderCloseness() {
       {/* Closeness Ranking Table */}
       <section className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <div className={`bg-gradient-to-r ${currentMode.gradient} px-6 py-5`}>
-          <h2 className="text-xl font-black text-white">{labels.comp} Season Closeness Rankings</h2>
+          <h2 className="display-font text-xl font-black text-white">{labels.comp} Season Closeness Rankings</h2>
           <p className="text-white/70 text-sm mt-1">{labels.subtext}</p>
         </div>
 
@@ -304,17 +305,12 @@ export default function LadderCloseness() {
                     <td className="py-4 px-4">
                       {teamInfo && (
                         <div className="flex items-center gap-2">
-                          <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                            style={{ backgroundColor: teamInfo.colors.primary }}
-                          >
-                            {teamInfo.abbr.substring(0, 2)}
-                          </div>
+                          <TeamLogo teamKey={season.winnerKey} size="sm" />
                           <div>
                             <span className="font-semibold text-gray-800">{teamInfo.name}</span>
                             <span className="text-gray-400 text-xs ml-2">{season.leaderPts} pts</span>
                           </div>
-                          {season.isOfficial && <span className="text-yellow-500" title="Official winner">&#x1F3C6;</span>}
+                          {season.isOfficial && <span className="text-yellow-700 text-xs font-semibold" title="Official winner">Official</span>}
                         </div>
                       )}
                     </td>
@@ -359,7 +355,7 @@ export default function LadderCloseness() {
       {/* Visual: Season comparison bars */}
       <section className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <div className="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-5">
-          <h2 className="text-xl font-black text-white">{labels.comp} Points Distribution by Season</h2>
+          <h2 className="display-font text-xl font-black text-white">{labels.comp} Points Distribution by Season</h2>
           <p className="text-amber-100 text-sm mt-1">
             How spread out were the {mode === 'mcclelland' ? 'combined' : mode.toUpperCase()} points each year? Tighter bars = closer race.
           </p>

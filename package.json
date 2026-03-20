@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
+    "build:linear-title": "node server/scripts/buildLinearTitle.js",
+    "build:worms": "node server/scripts/buildWormCache.js",
+    "build:game-evolution": "Rscript server/scripts/build_game_evolution.R",
+    "build:alltime-afl": "node server/scripts/buildAlltimeAFL.js"
   },
   "dependencies": {
     "react": "^18.2.0",

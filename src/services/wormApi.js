@@ -50,6 +50,8 @@ function formatMatch(m) {
     awayTeam: getTeamKey(m.awayTeam),
     homeTeamName: m.homeTeam,
     awayTeamName: m.awayTeam,
+    homeScore: m.homeScore ?? null,
+    awayScore: m.awayScore ?? null,
     worm: m.margins.map((margin, i) => ({ time: i, margin })),
     maxAbsMargin: m.maxAbsMargin,
   };
@@ -128,6 +130,10 @@ export async function fetchMostSimilar(limit = 50) {
         awayTeam: getTeamKey(a?.awayTeam || ''),
         homeTeamName: a?.homeTeam,
         awayTeamName: a?.awayTeam,
+        homeScore: a?.homeScore ?? null,
+        awayScore: a?.awayScore ?? null,
+        worm: a?.margins?.map((margin, i) => ({ time: i, margin })) || [],
+        finalMargin: a?.margins?.[a.margins.length - 1] ?? null,
       },
       matchB: {
         matchId: p.matchB,
@@ -137,6 +143,10 @@ export async function fetchMostSimilar(limit = 50) {
         awayTeam: getTeamKey(b?.awayTeam || ''),
         homeTeamName: b?.homeTeam,
         awayTeamName: b?.awayTeam,
+        homeScore: b?.homeScore ?? null,
+        awayScore: b?.awayScore ?? null,
+        worm: b?.margins?.map((margin, i) => ({ time: i, margin })) || [],
+        finalMargin: b?.margins?.[b.margins.length - 1] ?? null,
       },
     };
   });

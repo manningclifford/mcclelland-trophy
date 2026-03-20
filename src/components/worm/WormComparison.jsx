@@ -43,16 +43,16 @@ export default function WormComparison({ matchId }) {
   if (loading) {
     return (
       <div className="mt-6 text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-3 text-gray-500">Loading worm data...</p>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-stone-600"></div>
+        <p className="mt-3 text-stone-500">Loading worm data...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mt-6 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center">
-        <p className="text-red-700">{error}</p>
+      <div className="mt-6 bg-stone-50 border border-stone-200 px-4 py-3 text-center">
+        <p className="text-stone-700">{error}</p>
       </div>
     );
   }
@@ -65,38 +65,63 @@ export default function WormComparison({ matchId }) {
   const simHomeName = similar ? teamName(similar.homeTeam, similar.homeTeamName) : '';
   const simAwayName = similar ? teamName(similar.awayTeam, similar.awayTeamName) : '';
 
+  function GameDetails({ match, label, showSimilarity }) {
+    const home = teamName(match.homeTeam, match.homeTeamName);
+    const away = teamName(match.awayTeam, match.awayTeamName);
+    const hasScore = match.homeScore != null && match.awayScore != null;
+    const winner = !hasScore ? null
+      : match.homeScore > match.awayScore ? home
+      : match.awayScore > match.homeScore ? away
+      : null;
+    const margin = hasScore ? Math.abs(match.homeScore - match.awayScore) : null;
+
+    return (
+      <div className="mt-3 bg-stone-50 border border-stone-200 px-4 py-3">
+        <p className="text-xs text-stone-400 uppercase tracking-wider font-semibold mb-1">{label}</p>
+        <p className="display-font text-base font-bold text-stone-900">{home} vs {away}</p>
+        <p className="text-sm text-stone-500 mt-0.5">Round {match.round}, {match.season}</p>
+        {hasScore && (
+          <p className="text-lg font-bold text-stone-900 mt-2 tabular-nums">
+            {match.homeScore} – {match.awayScore}
+          </p>
+        )}
+        {margin != null && (
+          <p className="text-sm text-stone-500 mt-0.5">
+            {winner ? `${winner} by ${margin} pts` : 'Draw'}
+          </p>
+        )}
+        {showSimilarity && similar?.matchId && (
+          <p className="text-xs text-stone-400 mt-2">
+            Similarity score: <span className="font-semibold text-stone-600">{similar.similarity}</span>
+            <span className="ml-1">(lower = more similar)</span>
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6">
-      {similar && similar.matchId ? (
-        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-center">
-          <span className="text-green-800 font-semibold text-lg">
-            Similarity score: {similar.similarity}
-          </span>
-          <span className="text-green-600 text-sm ml-2">(lower = more similar)</span>
-          <p className="text-green-700 text-sm mt-1">
-            Most similar match: {simHomeName} vs {simAwayName} (Round {similar.round}, {similar.season})
-          </p>
-        </div>
-      ) : similar?.message ? (
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-center">
-          <p className="text-yellow-700 text-sm">{similar.message}</p>
-        </div>
-      ) : null}
-
-      <div className={`grid grid-cols-1 ${similar?.matchId ? 'md:grid-cols-2' : ''} gap-4`}>
-        <WormChart
-          wormData={selected.worm}
-          homeTeam={selected.homeTeam}
-          awayTeam={selected.awayTeam}
-          title={`${homeName} vs ${awayName} (Selected)`}
-        />
-        {similar?.matchId && similar.worm && (
+      <div className={`grid grid-cols-1 ${similar?.matchId ? 'md:grid-cols-2' : ''} gap-6`}>
+        <div>
           <WormChart
-            wormData={similar.worm}
-            homeTeam={similar.homeTeam}
-            awayTeam={similar.awayTeam}
-            title={`${simHomeName} vs ${simAwayName} (${similar.season} R${similar.round})`}
+            wormData={selected.worm}
+            homeTeam={selected.homeTeam}
+            awayTeam={selected.awayTeam}
+            title="Selected game"
           />
+          <GameDetails match={selected} label="Selected game" showSimilarity={false} />
+        </div>
+        {similar?.matchId && similar.worm && (
+          <div>
+            <WormChart
+              wormData={similar.worm}
+              homeTeam={similar.homeTeam}
+              awayTeam={similar.awayTeam}
+              title="Most similar game"
+            />
+            <GameDetails match={similar} label="Most similar game" showSimilarity={true} />
+          </div>
         )}
       </div>
     </div>

@@ -17,13 +17,13 @@ export default function WormChart({ wormData, homeTeam, awayTeam, title }) {
   const awayInfo = teams[awayTeam] || { name: awayTeam, colors: { primary: '#999' } };
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white border border-stone-200 p-4">
       {title && (
-        <h3 className="text-sm font-semibold text-gray-700 mb-3 text-center">{title}</h3>
+        <h3 className="text-sm font-semibold text-stone-700 mb-3 text-center">{title}</h3>
       )}
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={wormData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" />
           <XAxis
             dataKey="time"
             label={{ value: 'Game Time (min)', position: 'insideBottom', offset: -2, fontSize: 12 }}

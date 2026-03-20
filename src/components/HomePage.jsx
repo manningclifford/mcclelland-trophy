@@ -2,54 +2,61 @@ import React from 'react';
 
 const FEATURES = [
   {
+    path: '/linear-title',
+    title: 'Brunswick Street Shield',
+    description: 'Named after Brunswick Street Oval, site of the first VFL game in 1897 — a challenger title that passes between clubs on the field. It only changes hands when the holder is beaten.',
+    label: 'Title history',
+  },
+  {
+    path: '/game-evolution',
+    title: 'Change in the Game',
+    description: 'How has AFL football changed since 1990? Scoring, margins, disposals, tackles, clearances and more — tracked across every modern season.',
+    label: 'Historical trends',
+  },
+  {
     path: '/mcclelland',
     title: 'McClelland Trophy',
     description: 'Which AFL club has the best combined performance across both AFL and AFLW? Track the McClelland Trophy standings from 2017 to today.',
-    gradient: 'from-amber-500 via-yellow-500 to-amber-600',
-    icon: '\uD83C\uDFC6',
-  },
-  {
-    path: '/ladder-closeness',
-    title: 'Ladder Closeness',
-    description: 'Which seasons went down to the wire? Rank every AFL, AFLW, and combined season by how tight the ladder was from top to bottom.',
-    gradient: 'from-emerald-600 via-green-500 to-emerald-700',
-    icon: '\uD83D\uDCCA',
+    label: 'Combined standings',
   },
   {
     path: '/worm-similarity',
     title: 'Worm Similarity',
     description: 'Pick any AFL game and find the historical match with the most similar scoring worm. Explore the 50 most similar game pairs across 2012-2025.',
-    gradient: 'from-sky-600 via-blue-500 to-indigo-600',
-    icon: '\uD83D\uDCC8',
+    label: 'Game comparison',
+  },
+  {
+    path: '/alltime-ladder',
+    title: 'Meta Premiership',
+    description: 'Every regular-season game since the first VFL match in 1897, aggregated into a single ladder. Which club has the best win record across 130 years of football?',
+    label: 'Since 1897',
   },
 ];
 
 export default function HomePage({ onNavigate }) {
   return (
     <div>
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-black text-gray-800 mb-3">
-          Welcome to <span className="text-emerald-700">The Sherrin Spreadsheets</span>
-        </h2>
-        <p className="text-gray-500 max-w-xl mx-auto text-lg">
+      <div className="text-center mb-10 pb-8 border-b border-stone-300">
+        <p className="text-stone-500 max-w-lg mx-auto leading-relaxed">
           A collection of tools exploring the curious corners of Australian football through data.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        {FEATURES.map(({ path, title, description, gradient, icon }) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {FEATURES.map(({ path, title, description, label, icon }) => (
           <button
             key={path}
             onClick={() => onNavigate(path)}
-            className="text-left bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 group border border-gray-100"
+            className="text-left bg-white border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all duration-200 group"
           >
-            <div className={`bg-gradient-to-br ${gradient} px-6 py-6 relative overflow-hidden`}>
-              <div className="absolute inset-0 footy-stripe opacity-30" />
-              <span className="text-4xl relative z-10">{icon}</span>
-              <h3 className="text-xl font-black text-white mt-3 group-hover:underline relative z-10">{title}</h3>
+            <div className="px-6 pt-6 pb-5 border-b border-stone-100">
+              <h3 className="display-font text-xl font-bold text-stone-900 group-hover:underline">
+                {title}
+              </h3>
+              <p className="text-stone-400 text-xs tracking-wider uppercase mt-1">{label}</p>
             </div>
-            <div className="px-6 py-5">
-              <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+            <div className="px-6 py-4">
+              <p className="text-stone-600 text-sm leading-relaxed">{description}</p>
             </div>
           </button>
         ))}

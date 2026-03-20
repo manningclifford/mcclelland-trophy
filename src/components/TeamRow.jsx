@@ -1,5 +1,6 @@
 import React from 'react';
 import { getTeamInfo } from '../data/teams';
+import TeamLogo from './TeamLogo';
 
 export default function TeamRow({ team, position }) {
   const teamInfo = getTeamInfo(team.team);
@@ -27,18 +28,13 @@ export default function TeamRow({ team, position }) {
       </td>
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-            style={{ backgroundColor: teamInfo.colors.primary }}
-          >
-            {teamInfo.abbr.substring(0, 2)}
-          </div>
+          <TeamLogo teamKey={team.team} size="md" />
           <span className={`font-medium ${isTopEight ? 'text-gray-900' : 'text-gray-600'}`}>
             {teamInfo.name}
           </span>
           {position === 1 && (
-            <span className="text-yellow-500 text-lg" title="McClelland Trophy Leader">
-              🏆
+            <span className="text-yellow-600 text-xs font-semibold uppercase tracking-wide" title="McClelland Trophy Leader">
+              Leader
             </span>
           )}
         </div>

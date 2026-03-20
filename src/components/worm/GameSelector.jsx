@@ -46,12 +46,12 @@ export default function GameSelector({
   return (
     <div className="flex flex-col sm:flex-row gap-3">
       <div className="flex items-center gap-2">
-        <label htmlFor="worm-season" className="text-sm font-medium text-gray-700">Season:</label>
+        <label htmlFor="worm-season" className="text-sm font-medium text-stone-700">Season:</label>
         <select
           id="worm-season"
           value={selectedSeason || ''}
           onChange={(e) => onSeasonChange(e.target.value ? Number(e.target.value) : null)}
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          className="px-3 py-2 border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 text-sm"
         >
           <option value="">Select season</option>
           {seasons.map((s) => (
@@ -61,13 +61,13 @@ export default function GameSelector({
       </div>
 
       <div className="flex items-center gap-2">
-        <label htmlFor="worm-round" className="text-sm font-medium text-gray-700">Round:</label>
+        <label htmlFor="worm-round" className="text-sm font-medium text-stone-700">Round:</label>
         <select
           id="worm-round"
           value={selectedRound || ''}
           onChange={(e) => onRoundChange(e.target.value ? Number(e.target.value) : null)}
           disabled={!selectedSeason || loading === 'rounds'}
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="px-3 py-2 border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 text-sm disabled:bg-stone-100 disabled:cursor-not-allowed"
         >
           <option value="">{loading === 'rounds' ? 'Loading...' : 'Select round'}</option>
           {rounds.map((r) => (
@@ -77,13 +77,13 @@ export default function GameSelector({
       </div>
 
       <div className="flex items-center gap-2">
-        <label htmlFor="worm-match" className="text-sm font-medium text-gray-700">Match:</label>
+        <label htmlFor="worm-match" className="text-sm font-medium text-stone-700">Match:</label>
         <select
           id="worm-match"
           value={selectedMatch || ''}
           onChange={(e) => onMatchChange(e.target.value || null)}
           disabled={!selectedRound || loading === 'matches'}
-          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="px-3 py-2 border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 text-sm disabled:bg-stone-100 disabled:cursor-not-allowed"
         >
           <option value="">{loading === 'matches' ? 'Loading...' : 'Select match'}</option>
           {matches.map((m) => (

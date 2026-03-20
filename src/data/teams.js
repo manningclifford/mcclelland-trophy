@@ -1,4 +1,5 @@
-// Team metadata with colors and abbreviations
+// Team metadata with colors, abbreviations and logo paths.
+// Logos are served from public/teams/{teamKey}.png
 export const teams = {
   adelaide: {
     name: 'Adelaide',
@@ -89,6 +90,17 @@ export const teams = {
     name: 'Western Bulldogs',
     abbr: 'WBD',
     colors: { primary: '#014896', secondary: '#CC2031' },
+  },
+  // Historical VFL clubs (defunct or absorbed)
+  fitzroy: {
+    name: 'Fitzroy',
+    abbr: 'FIT',
+    colors: { primary: '#8B1A1A', secondary: '#FFD200' },
+  },
+  university: {
+    name: 'University',
+    abbr: 'UNI',
+    colors: { primary: '#003087', secondary: '#C0C0C0' },
   },
 };
 

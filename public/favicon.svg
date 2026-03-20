@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" rx="5" fill="#1c1917"/>
+  <!-- Header row -->
+  <rect x="4" y="4" width="24" height="6" rx="1" fill="#44403c"/>
+  <!-- Column dividers in header -->
+  <rect x="13" y="4" width="1" height="6" fill="#1c1917"/>
+  <rect x="22" y="4" width="1" height="6" fill="#1c1917"/>
+  <!-- Row 1 -->
+  <rect x="4" y="12" width="8" height="4" rx="0.5" fill="#292524"/>
+  <rect x="14" y="12" width="7" height="4" rx="0.5" fill="#292524"/>
+  <rect x="23" y="12" width="5" height="4" rx="0.5" fill="#d6d3d1" opacity="0.6"/>
+  <!-- Row 2 -->
+  <rect x="4" y="18" width="8" height="4" rx="0.5" fill="#292524"/>
+  <rect x="14" y="18" width="7" height="4" rx="0.5" fill="#292524"/>
+  <rect x="23" y="18" width="5" height="4" rx="0.5" fill="#d6d3d1" opacity="0.4"/>
+  <!-- Row 3 -->
+  <rect x="4" y="24" width="8" height="4" rx="0.5" fill="#292524"/>
+  <rect x="14" y="24" width="7" height="4" rx="0.5" fill="#292524"/>
+  <rect x="23" y="24" width="5" height="4" rx="0.5" fill="#d6d3d1" opacity="0.25"/>
+</svg>
