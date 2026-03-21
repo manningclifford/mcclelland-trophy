@@ -13,7 +13,10 @@
     "build:worms": "node server/scripts/buildWormCache.js",
     "build:game-evolution": "Rscript server/scripts/build_game_evolution.R",
     "build:alltime-afl": "node server/scripts/buildAlltimeAFL.js",
-    "build:attendance": "node server/scripts/buildAttendance.js"
+    "build:attendance": "node server/scripts/buildAttendance.js",
+    "fetch:worms": "Rscript server/scripts/fetch_worms_year.R",
+    "merge:worms": "node server/scripts/mergeRawWorms.js",
+    "update:worms": "npm run fetch:worms && npm run merge:worms"
   },
   "dependencies": {
     "react": "^18.2.0",

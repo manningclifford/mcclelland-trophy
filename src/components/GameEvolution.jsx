@@ -191,8 +191,9 @@ export default function GameEvolution() {
     );
   }
 
-  // Exclude the current in-progress season (too few games to be meaningful)
-  const raw = data.seasons.filter(s => s.year <= 2025);
+  const currentYear = new Date().getFullYear();
+  const raw = data.seasons.filter(s => s.year <= currentYear);
+  const provisionalYear = raw.at(-1)?.gamesPlayed < 50 ? raw.at(-1)?.year : null;
 
   // 2020 had 16-min quarters instead of 20-min — scale raw totals/averages by 20/16 = 1.25
   // Percentages and ratios (closePct, blowoutPct, homeWinPct, scoringEfficiency) are unaffected.
@@ -259,6 +260,9 @@ export default function GameEvolution() {
           * 2020 figures scaled by ×1.25 to account for the COVID-shortened quarters (16 min vs the standard 20 min),
           allowing direct comparison with other seasons. Percentages and ratios are unaffected.
         </p>
+        {provisionalYear && (
+          <p>† {provisionalYear} figures are provisional — season in progress ({raw.at(-1).gamesPlayed} games played).</p>
+        )}
         <p>Source: afltables via fitzRoy. Generated {new Date(data.generatedAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' })}.</p>
       </div>
     </div>
