@@ -235,7 +235,7 @@ async function main() {
     events,
   };
 
-  const outPath = path.join(__dirname, '../../linear_title.json');
+  const outPath = path.join(__dirname, '../../public/linear_title.json');
   writeFileSync(outPath, JSON.stringify(output));
 
   console.log(`\nDone.`);
