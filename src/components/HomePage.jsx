@@ -50,6 +50,10 @@ export default function HomePage({ onNavigate }) {
   const evLatest = evolution?.at(-1);
   const evFirst = evolution?.[0];
   const latestAttendance = attendance?.at(-1);
+  const earliestAttendance = attendance?.[0];
+  const attendancePctChange = latestAttendance && earliestAttendance
+    ? Math.round((latestAttendance.avg - earliestAttendance.avg) / earliestAttendance.avg * 100)
+    : null;
   const alltimeLeader = alltime?.[0];
   const alltimeLeaderInfo = alltimeLeader ? getTeamInfo(alltimeLeader.team) : null;
   const brisbaneInfo = getTeamInfo('brisbane');
@@ -59,7 +63,7 @@ export default function HomePage({ onNavigate }) {
       path: '/linear-title',
       title: 'Brunswick St Shield',
       label: 'Title history',
-      description: 'A challenger belt for Australian football — passes between clubs every time the holder is beaten.',
+      description: 'A challenger belt that passes between clubs every time the holder is beaten.',
       stat: (
         <Stat>
           {holderInfo ? (
@@ -78,26 +82,10 @@ export default function HomePage({ onNavigate }) {
       ),
     },
     {
-      path: '/mcclelland',
-      title: 'McLelland Trophy',
-      label: 'Combined standings',
-      description: 'Best combined record across AFL and AFLW. Track the standings from 2017 to today.',
-      stat: (
-        <Stat>
-          <TeamLogo teamKey="brisbane" size="sm" />
-          <div className="ml-3 min-w-0">
-            <p className="text-xs text-stone-400 uppercase tracking-widest">2025 winner</p>
-            <p className="font-bold text-stone-900">{brisbaneInfo.name} · 112 pts</p>
-            <p className="text-xs text-stone-500">AFL 48 · AFLW 64</p>
-          </div>
-        </Stat>
-      ),
-    },
-    {
       path: '/game-evolution',
       title: 'Game Changes',
       label: 'Historical trends',
-      description: 'Scoring, margins, disposals, tackles and more — every season since 1990.',
+      description: 'How has the game changed? Scoring, disposals, tackles and more since 1990.',
       stat: (
         <Stat className="justify-between">
           <div className="min-w-0">
@@ -114,10 +102,26 @@ export default function HomePage({ onNavigate }) {
       ),
     },
     {
+      path: '/mcclelland',
+      title: 'McLelland Trophy',
+      label: 'Combined standings',
+      description: 'Combined AFL and AFLW standings. Which club dominates both competitions?',
+      stat: (
+        <Stat>
+          <TeamLogo teamKey="brisbane" size="sm" />
+          <div className="ml-3 min-w-0">
+            <p className="text-xs text-stone-400 uppercase tracking-widest">2025 winner</p>
+            <p className="font-bold text-stone-900">{brisbaneInfo.name} · 112 pts</p>
+            <p className="text-xs text-stone-500">AFL 48 · AFLW 64</p>
+          </div>
+        </Stat>
+      ),
+    },
+    {
       path: '/worm-similarity',
       title: 'Similar Worms',
       label: 'Game comparison',
-      description: 'Find the historical AFL game with the most similar scoring worm to any match, 2012–2026.',
+      description: 'Pick any AFL game and find its closest historical twin by scoring worm.',
       stat: (
         <Stat>
           <div>
@@ -132,13 +136,18 @@ export default function HomePage({ onNavigate }) {
       path: '/attendance',
       title: 'Attendance Data',
       label: 'Crowds',
-      description: 'Season averages, per-club breakdowns, and the full crowd history since 1965.',
+      description: 'Season averages and per-club breakdowns. Crowd trends since 1965.',
       stat: (
         <Stat className="justify-between">
           <div className="min-w-0">
             <p className="text-xs text-stone-400 uppercase tracking-widest">Avg crowd</p>
             {latestAttendance ? (
-              <p className="font-bold text-stone-900">{latestAttendance.avg.toLocaleString()} in {latestAttendance.year}</p>
+              <>
+                <p className="font-bold text-stone-900">{latestAttendance.avg.toLocaleString()} in {latestAttendance.year}</p>
+                {attendancePctChange !== null && (
+                  <p className="text-xs text-stone-400">up {attendancePctChange}% since {earliestAttendance.year}</p>
+                )}
+              </>
             ) : <div className="h-5 w-32 bg-stone-200 rounded animate-pulse mt-1" />}
           </div>
           {attendance && <Sparkline data={attendance} valueKey="avg" />}
@@ -149,7 +158,7 @@ export default function HomePage({ onNavigate }) {
       path: '/alltime-ladder',
       title: 'Meta Prems',
       label: 'Since 1897',
-      description: 'Every regular-season game since 1897 on one ladder. Who leads across 130 years?',
+      description: 'One ladder, every game since 1897. Who leads across 130 years of football?',
       stat: (
         <Stat>
           {alltimeLeaderInfo ? (
