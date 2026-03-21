@@ -1,29 +1,103 @@
 import React, { useState, useEffect } from 'react';
-import { getLinearTitleMeta, getAllEvents, getNextContentionGame } from '../services/linearTitleApi';
+import { getLinearTitleMeta, getAllEvents, getShieldSchedule } from '../services/linearTitleApi';
 import { getTeamInfo } from '../data/teams';
 import TeamLogo from './TeamLogo';
 
-
-function HolderCard({ teamKey, defenses, totalChanges, firstYear }) {
-  const info = getTeamInfo(teamKey);
+function InfoRow({ label, children }) {
   return (
-    <div
-      className="bg-white border border-stone-200 flex items-center gap-5 px-6 py-5"
-      style={{ borderLeftWidth: 4, borderLeftColor: info.colors.primary }}
-    >
-      <TeamLogo teamKey={teamKey} size="lg" />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1">Current Brunswick Street Shield Holder</p>
-        <h2 className="display-font text-2xl font-black text-stone-900">{info.name}</h2>
-        <p className="text-sm text-stone-500 mt-0.5">
-          {defenses === 0
-            ? 'Title just won — no defenses yet'
-            : `${defenses} successful defense${defenses !== 1 ? 's' : ''} this reign`}
-        </p>
+    <div className="flex items-start gap-4 px-6 py-3">
+      <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 w-40 flex-shrink-0 pt-0.5">{label}</p>
+      <div className="text-sm text-stone-700 flex items-center gap-2 flex-wrap">{children}</div>
+    </div>
+  );
+}
+
+function HolderCard({ teamKey, defenses, totalChanges, firstYear, wonFromEvent, shieldSchedule }) {
+  const info = getTeamInfo(teamKey);
+
+  // Won from row
+  let wonFromContent = null;
+  if (wonFromEvent) {
+    const isHome = wonFromEvent.homeTeam === teamKey;
+    const holderScore = isHome ? wonFromEvent.homeScore : wonFromEvent.awayScore;
+    const oppScore = isHome ? wonFromEvent.awayScore : wonFromEvent.homeScore;
+    const prevInfo = getTeamInfo(wonFromEvent.prevHolder);
+    wonFromContent = (
+      <>
+        <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: prevInfo.colors.primary }} />
+        <span>{prevInfo.name}</span>
+        <span className="text-stone-400">·</span>
+        <span className="font-mono">{holderScore}–{oppScore}</span>
+        <span className="text-stone-400">·</span>
+        <span className="text-stone-500">{wonFromEvent.roundName}, {wonFromEvent.season}</span>
+      </>
+    );
+  }
+
+  // Last defended row
+  let lastDefendedContent = null;
+  if (defenses === 0) {
+    lastDefendedContent = <span className="text-stone-400 italic">No defenses yet this reign</span>;
+  } else if (shieldSchedule?.lastDefense) {
+    const d = shieldSchedule.lastDefense;
+    const oppInfo = getTeamInfo(d.opponentKey);
+    lastDefendedContent = (
+      <>
+        <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: oppInfo.colors.primary }} />
+        <span>{oppInfo.name}</span>
+        <span className="text-stone-400">·</span>
+        <span className="font-mono">{d.holderScore}–{d.opponentScore}</span>
+        <span className="text-stone-400">·</span>
+        <span className="text-stone-500">{d.roundName}</span>
+      </>
+    );
+  } else {
+    lastDefendedContent = <span className="text-stone-400 italic">Loading…</span>;
+  }
+
+  // Next contention game row
+  let nextGameContent = null;
+  if (shieldSchedule === null || shieldSchedule?.nextGame === null) {
+    nextGameContent = <span className="text-stone-400 italic">No upcoming fixtures</span>;
+  } else if (shieldSchedule?.nextGame) {
+    const ng = shieldSchedule.nextGame;
+    const oppInfo = getTeamInfo(ng.opponentKey);
+    const dateStr = ng.date
+      ? new Date(ng.date.replace(' ', 'T')).toLocaleDateString('en-AU', {
+          weekday: 'short', day: 'numeric', month: 'short',
+        })
+      : null;
+    nextGameContent = (
+      <>
+        <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: oppInfo.colors.primary }} />
+        <span>{oppInfo.name}</span>
+        <span className="text-xs bg-stone-200 text-stone-600 px-1.5 py-0.5">{ng.isHome ? 'Home' : 'Away'}</span>
+        {ng.venue && <><span className="text-stone-400">·</span><span className="text-stone-500">{ng.venue}</span></>}
+        <span className="text-stone-400">·</span>
+        <span className="text-stone-500">{ng.roundName}{dateStr ? `, ${dateStr}` : ''}</span>
+      </>
+    );
+  } else {
+    nextGameContent = <span className="text-stone-400 italic">Loading…</span>;
+  }
+
+  return (
+    <div className="bg-white border border-stone-200" style={{ borderLeftWidth: 4, borderLeftColor: info.colors.primary }}>
+      <div className="flex items-center gap-5 px-6 py-5">
+        <TeamLogo teamKey={teamKey} size="lg" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1">Current Brunswick Street Shield Holder</p>
+          <h2 className="display-font text-2xl font-black text-stone-900">{info.name}</h2>
+        </div>
+        <div className="text-right hidden sm:block flex-shrink-0">
+          <p className="display-font text-3xl font-black text-stone-900">{totalChanges.toLocaleString()}</p>
+          <p className="text-xs text-stone-400 uppercase tracking-wide mt-0.5">title changes since {firstYear}</p>
+        </div>
       </div>
-      <div className="text-right hidden sm:block flex-shrink-0">
-        <p className="display-font text-3xl font-black text-stone-900">{totalChanges.toLocaleString()}</p>
-        <p className="text-xs text-stone-400 uppercase tracking-wide mt-0.5">title changes since {firstYear}</p>
+      <div className="border-t border-stone-100 divide-y divide-stone-100">
+        <InfoRow label="Won from">{wonFromContent}</InfoRow>
+        <InfoRow label="Last defended">{lastDefendedContent}</InfoRow>
+        <InfoRow label="Next contention game">{nextGameContent}</InfoRow>
       </div>
     </div>
   );
@@ -102,7 +176,7 @@ export default function LinearTitle() {
   const [meta, setMeta] = useState(null);
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
-  const [nextGame, setNextGame] = useState(undefined);
+  const [shieldSchedule, setShieldSchedule] = useState(undefined);
   const [filterTeam, setFilterTeam] = useState('');
   const [sortCol, setSortCol] = useState('index');
   const [sortDir, setSortDir] = useState('asc');
@@ -117,9 +191,9 @@ export default function LinearTitle() {
       .then(([m, evts]) => {
         setMeta(m);
         setEvents(evts);
-        getNextContentionGame(m.currentHolder)
-          .then(setNextGame)
-          .catch(() => setNextGame(null));
+        getShieldSchedule(m.currentHolder)
+          .then(setShieldSchedule)
+          .catch(() => setShieldSchedule(null));
       })
       .catch(err => setError(err.message));
   }, []);
@@ -226,51 +300,18 @@ export default function LinearTitle() {
         defenses={meta.currentDefenses}
         totalChanges={meta.totalChanges}
         firstYear={meta.firstYear}
+        wonFromEvent={events.filter(e => e.type === 'change').at(-1)}
+        shieldSchedule={shieldSchedule}
       />
-
-      {/* Next contention game */}
-      {nextGame && (() => {
-        const opponentInfo = getTeamInfo(nextGame.opponentKey);
-        const dateStr = nextGame.date
-          ? new Date(nextGame.date.replace(' ', 'T')).toLocaleDateString('en-AU', {
-              weekday: 'short', day: 'numeric', month: 'short',
-              hour: 'numeric', minute: '2-digit', hour12: true,
-            })
-          : null;
-        return (
-          <div className="bg-stone-50 border border-stone-200 flex items-center gap-4 px-6 py-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-2">Next contention game</p>
-              <div className="flex items-center gap-3">
-                <TeamLogo teamKey={nextGame.opponentKey} size="md" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-stone-800">{opponentInfo.name}</span>
-                    <span className="text-xs bg-stone-200 text-stone-600 px-1.5 py-0.5">
-                      {nextGame.isHome ? 'Home' : 'Away'}
-                    </span>
-                  </div>
-                  {nextGame.venue && (
-                    <p className="text-xs text-stone-500 mt-0.5">{nextGame.venue}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="text-right flex-shrink-0">
-              <p className="text-sm font-semibold text-stone-700">{nextGame.roundName}</p>
-              {dateStr && <p className="text-xs text-stone-400 mt-0.5">{dateStr}</p>}
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Recent holders */}
       {(() => {
-        const changes = events.filter(e => e.type === 'change').slice(-5).reverse();
-        // changes[0] = most recent winner (current holder)
-        // defenses for changes[i] = how many times they defended before losing
-        //   = changes[i-1].defensesBeforeLoss  (the event where they lost)
-        // current holder's defenses = meta.currentDefenses
+        // Skip the most recent change (current holder) — shown in the holder card above
+        const allChanges = events.filter(e => e.type === 'change');
+        const changes = allChanges.slice(-6, -1).reverse();
+        // The event where each holder lost is one step ahead in allChanges:
+        // changes[i] = allChanges[n-2-i], and it lost to allChanges[n-1-i]
+        const currentHolderEvent = allChanges.at(-1);
         return (
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Recent Shield changes</p>
@@ -279,7 +320,8 @@ export default function LinearTitle() {
                 const info = getTeamInfo(e.newHolder);
                 const margin = Math.abs((e.homeScore || 0) - (e.awayScore || 0));
                 const defeated = e.prevHolder ? getTeamInfo(e.prevHolder).name : null;
-                const defenses = i === 0 ? meta.currentDefenses : changes[i - 1].defensesBeforeLoss;
+                const nextEvent = i === 0 ? currentHolderEvent : changes[i - 1];
+                const defenses = nextEvent?.defensesBeforeLoss ?? 0;
                 return (
                   <div key={i} className="bg-white px-4 py-3">
                     <div className="flex items-center gap-2 mb-1">
@@ -289,9 +331,7 @@ export default function LinearTitle() {
                     <p className="text-xs text-stone-400">R{e.round}, {e.season}</p>
                     {defeated && <p className="text-xs text-stone-500 mt-0.5">def. {defeated} by {margin}</p>}
                     <p className="text-xs text-stone-400 mt-0.5">
-                      {i === 0
-                        ? defenses === 0 ? 'no defenses yet' : `${defenses} defense${defenses !== 1 ? 's' : ''} so far`
-                        : defenses === 0 ? 'lost immediately' : `defended ${defenses}×`}
+                      {defenses === 0 ? 'lost immediately' : `defended ${defenses}×`}
                     </p>
                   </div>
                 );
