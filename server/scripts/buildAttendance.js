@@ -15,7 +15,7 @@ import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const FIRST_YEAR = 1965;
-const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_YEAR = 2025;
 const USER_AGENT = 'SherrinSpreadsheets/Attendance (github.com/manning/mcclelland-trophy)';
 
 const TEAM_NAME_MAP = {
