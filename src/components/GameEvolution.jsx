@@ -25,7 +25,8 @@ const GROUPS = [
       { key: 'avgMargin',  label: 'Avg Winning Margin', unit: 'pts', desc: 'Average points difference between the teams at the final siren' },
       { key: 'closePct',   label: 'Close Games',        unit: '%',   desc: 'Percentage of games decided by 12 points or fewer — roughly two kicks' },
       { key: 'blowoutPct', label: 'Blowouts',           unit: '%',   desc: 'Percentage of games decided by more than 50 points' },
-      { key: 'homeWinPct', label: 'Home Win Rate',      unit: '%',   desc: 'Percentage of games won by the designated home team' },
+      { key: 'homeWinPct',   label: 'Home Win Rate',    unit: '%',   desc: 'Percentage of games won by the designated home team' },
+      { key: 'avgFreeKicks', label: 'Free Kicks per Game', unit: '', desc: 'Total free kicks awarded across both teams per match — reflects rule interpretation and how physical/skillful the game is being played' },
     ],
   },
   {
@@ -46,7 +47,8 @@ const GROUPS = [
       { key: 'avgTackles',    label: 'Tackles per Game',    unit: '', desc: 'Total tackles across both teams — legally bringing an opponent to ground or trapping them holding the ball' },
       { key: 'avgClearances', label: 'Clearances per Game', unit: '', desc: 'Total clearances across both teams — winning the ball out of a stoppage and moving it away from the contest' },
       { key: 'avgHitouts',    label: 'Hit-outs per Game',   unit: '', desc: 'Total hit-outs across both teams — a ruckman tapping the ball to a teammate at a centre bounce or ball-up' },
-      { key: 'avgInside50s',  label: 'Inside 50s per Game', unit: '', desc: 'Total forward entries across both teams — moving the ball into the attacking 50m arc' },
+      { key: 'avgInside50s',  label: 'Inside 50s per Game',    unit: '', desc: 'Total forward entries across both teams — moving the ball into the attacking 50m arc' },
+      { key: 'avgOnePercent', label: 'One Percenters per Game', unit: '', desc: 'Total one percenters across both teams — spoils, smothers, and rushed behinds that don\'t appear in standard disposal counts but reflect contested physical effort' },
     ],
   },
 ];
@@ -191,6 +193,7 @@ export default function GameEvolution() {
     'avgTotalScore','avgWinningScore','avgMargin','avgGoalsPerGame','avgBehindsPerGame',
     'avgDisposals','avgKicks','avgHandballs','avgMarks','avgTackles',
     'avgClearances','avgHitouts','avgInside50s','avgContested',
+    'avgFreeKicks','avgOnePercent',
   ];
   const seasons = raw.map(s => {
     if (s.year !== 2020) return s;

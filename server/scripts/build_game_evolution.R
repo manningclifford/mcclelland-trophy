@@ -76,7 +76,8 @@ for (year in FIRST_YEAR:LAST_YEAR) {
   player_agg <- list(
     avgKicks       = NA, avgHandballs  = NA, avgDisposals  = NA,
     avgMarks       = NA, avgTackles    = NA, avgClearances = NA,
-    avgHitouts     = NA, avgInside50s  = NA, avgContested  = NA
+    avgHitouts     = NA, avgInside50s  = NA, avgContested  = NA,
+    avgFreeKicks   = NA, avgOnePercent = NA
   )
 
   if (!is.null(player_stats) && nrow(player_stats) > 0) {
@@ -92,7 +93,8 @@ for (year in FIRST_YEAR:LAST_YEAR) {
       # Sum stats per game (match = Season + Round + Home.team), then average across games.
       # This gives "total per game" rather than "per player per game".
       stat_cols <- c("Kicks", "Handballs", "Disposals", "Marks", "Tackles",
-                     "Clearances", "Hit.Outs", "Inside.50s", "Contested.Possessions")
+                     "Clearances", "Hit.Outs", "Inside.50s", "Contested.Possessions",
+                     "Frees.For", "One.Percenters")
       stat_cols <- stat_cols[stat_cols %in% names(ps)]
 
       game_totals <- aggregate(
@@ -114,6 +116,8 @@ for (year in FIRST_YEAR:LAST_YEAR) {
       player_agg$avgHitouts     <- avg_game("Hit.Outs")
       player_agg$avgInside50s   <- avg_game("Inside.50s")
       player_agg$avgContested   <- avg_game("Contested.Possessions")
+      player_agg$avgFreeKicks   <- avg_game("Frees.For")
+      player_agg$avgOnePercent  <- avg_game("One.Percenters")
 
       cat(sprintf("  Player: %d games, disp=%.0f, tack=%.0f, clear=%.0f\n",
                   nrow(game_totals),
