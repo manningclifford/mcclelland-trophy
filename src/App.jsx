@@ -21,7 +21,7 @@ function getRoute() {
 
 function App() {
   const [route, setRoute] = useState(getRoute);
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
   const [standings, setStandings] = useState(null);
   const [isLive, setIsLive] = useState(false);
   const [error, setError] = useState(null);

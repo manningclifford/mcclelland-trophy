@@ -56,7 +56,7 @@ export default function WormSimilarity() {
       <p className="text-stone-500 leading-relaxed">
         Every AFL game has a scoring worm — the running margin as it rises and falls across four quarters.
         Select any match to see its worm, then compare it against the most mathematically similar game
-        in the record books. The table below lists the 50 closest pairs across all games from 2012–2025,
+        in the record books. The table below lists the 50 closest pairs across all games from 2012–2026,
         ranked by how little their worms diverge.
       </p>
 
@@ -99,7 +99,7 @@ export default function WormSimilarity() {
         <MostSimilarList onSelectPair={handleSelectPair} />
       </section>
 
-      <p className="text-xs text-stone-400 text-center pb-4">Source: Squiggle API. Covers home-and-away and finals, 2012–2025.</p>
+      <p className="text-xs text-stone-400 text-center pb-4">Source: Squiggle API. Covers home-and-away and finals, 2012–2026.</p>
     </div>
   );
 }

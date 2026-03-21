@@ -68,7 +68,7 @@ export default function MostSimilarList({ onSelectPair }) {
         <div className="h-px flex-1 bg-stone-200" />
       </div>
       <p className="text-sm text-stone-500 mb-4 text-center">
-        The 50 most similar pairs of scoring worms across all AFL games (2012–2025).
+        The 50 most similar pairs of scoring worms across all AFL games (2012–2026).
       </p>
       <div className="bg-white border border-stone-200 overflow-x-auto">
         <table className="min-w-full divide-y divide-stone-100">

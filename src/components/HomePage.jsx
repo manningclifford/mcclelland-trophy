@@ -22,7 +22,7 @@ const FEATURES = [
   {
     path: '/worm-similarity',
     title: 'Worm Similarity',
-    description: 'Pick any AFL game and find the historical match with the most similar scoring worm. Explore the 50 most similar game pairs across 2012-2025.',
+    description: 'Pick any AFL game and find the historical match with the most similar scoring worm. Explore the 50 most similar game pairs across 2012-2026.',
     label: 'Game comparison',
   },
   {
