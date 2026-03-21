@@ -1,21 +1,20 @@
 /**
- * buildAttendance.js
+ * patchAttendanceYear.js
  *
- * Scrapes Footywire's attendance endpoint for all seasons,
- * collecting season totals and per-team averages.
+ * Fetches attendance data for a single year from Footywire and upserts it
+ * into public/attendance.json. Much faster than a full rebuild.
  *
- * Usage: node server/scripts/buildAttendance.js
- * Output: public/attendance.json
+ * Usage: node server/scripts/patchAttendanceYear.js [year]
+ *        year defaults to current year
  */
 
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const FIRST_YEAR = 1965;
-const CURRENT_YEAR = new Date().getFullYear();
+const CACHE_PATH = path.join(__dirname, '../../public/attendance.json');
+const TARGET_YEAR = parseInt(process.argv[2] || new Date().getFullYear(), 10);
 const USER_AGENT = 'SherrinSpreadsheets/Attendance (github.com/manning/mcclelland-trophy)';
 
 const TEAM_NAME_MAP = {
@@ -69,18 +68,11 @@ function parseSortBy(html) {
   return rows;
 }
 
-let lastRequest = 0;
-
 async function fetchYear(year) {
-  const elapsed = Date.now() - lastRequest;
-  if (elapsed < 1200) await new Promise(r => setTimeout(r, 1200 - elapsed));
-  lastRequest = Date.now();
-
   const params = new URLSearchParams({
     sby: '1', template: 'attendances', advv: 'N', skipImg: 'Y',
     year: String(year), t: 'A', h: 'A', s: 'T',
   });
-
   const res = await fetch('https://www.footywire.com/afl/json/json-sort-stats-attendances.json', {
     method: 'POST',
     headers: {
@@ -90,67 +82,54 @@ async function fetchYear(year) {
     },
     body: params.toString(),
   });
-
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   return data.sortBy || '';
 }
 
 async function main() {
-  console.log(`Building attendance data ${FIRST_YEAR}–${CURRENT_YEAR}...\n`);
+  console.log(`Patching attendance for ${TARGET_YEAR}...`);
 
-  const seasons = {};
-  const failed = [];
+  const html = await fetchYear(TARGET_YEAR);
+  const rows = parseSortBy(html);
 
-  for (let year = FIRST_YEAR; year <= CURRENT_YEAR; year++) {
-    process.stdout.write(`\r  ${year}  `);
-    try {
-      const html = await fetchYear(year);
-      const rows = parseSortBy(html);
+  let seasonTotal = 0, seasonGames = 0, seasonAvg = 0;
+  const teams = [];
 
-      let seasonTotal = 0, seasonGames = 0, seasonAvg = 0;
-      const teams = [];
-
-      for (const cells of rows) {
-        const name = cells[0].replace(/^\s*/, '').trim();
-        const games = parseNumber(cells[1]);
-        const total = parseNumber(cells[2]);
-        const avg   = parseNumber(cells[3]);
-
-        if (name === 'ALL') {
-          seasonGames = games;
-          seasonTotal = total;
-          seasonAvg   = avg;
-        } else if (name && games > 0) {
-          teams.push({ team: getTeamKey(name), name, games, total, avg });
-        }
-      }
-
-      if (seasonGames === 0) {
-        process.stdout.write(`(no data)\n`);
-        continue;
-      }
-
-      seasons[year] = { year, games: seasonGames, total: seasonTotal, avg: seasonAvg, teams };
-      process.stdout.write(`games=${seasonGames} avg=${seasonAvg.toLocaleString()}\n`);
-    } catch (err) {
-      failed.push(year);
-      process.stdout.write(`FAILED: ${err.message}\n`);
+  for (const cells of rows) {
+    const name = cells[0].replace(/^\s*/, '').trim();
+    const games = parseNumber(cells[1]);
+    const total = parseNumber(cells[2]);
+    const avg   = parseNumber(cells[3]);
+    if (name === 'ALL') {
+      seasonGames = games; seasonTotal = total; seasonAvg = avg;
+    } else if (name && games > 0) {
+      teams.push({ team: getTeamKey(name), name, games, total, avg });
     }
   }
 
-  const output = {
-    firstYear: Math.min(...Object.keys(seasons).map(Number)),
-    lastYear: CURRENT_YEAR,
-    generatedAt: new Date().toISOString(),
-    failedYears: failed,
-    seasons: Object.values(seasons).sort((a, b) => a.year - b.year),
-  };
+  if (seasonGames === 0) {
+    console.log('No data returned for this year — nothing to update.');
+    return;
+  }
 
-  const outPath = path.join(__dirname, '../../public/attendance.json');
-  writeFileSync(outPath, JSON.stringify(output));
-  console.log(`\nDone. ${output.seasons.length} seasons written to public/attendance.json`);
-  if (failed.length) console.log(`Failed: ${failed.join(', ')}`);
+  const cache = JSON.parse(readFileSync(CACHE_PATH, 'utf-8'));
+  const idx = cache.seasons.findIndex(s => s.year === TARGET_YEAR);
+  const entry = { year: TARGET_YEAR, games: seasonGames, total: seasonTotal, avg: seasonAvg, teams };
+
+  if (idx >= 0) {
+    cache.seasons[idx] = entry;
+    console.log(`Updated existing ${TARGET_YEAR} entry.`);
+  } else {
+    cache.seasons.push(entry);
+    cache.seasons.sort((a, b) => a.year - b.year);
+    cache.lastYear = Math.max(cache.lastYear, TARGET_YEAR);
+    console.log(`Added new ${TARGET_YEAR} entry.`);
+  }
+
+  cache.generatedAt = new Date().toISOString();
+  writeFileSync(CACHE_PATH, JSON.stringify(cache));
+  console.log(`Done. games=${seasonGames} avg=${seasonAvg.toLocaleString()}`);
 }
 
 main().catch(err => { console.error('Fatal:', err); process.exit(1); });

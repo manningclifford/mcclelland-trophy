@@ -21,7 +21,6 @@ export async function loadAttendance() {
 export async function getSeasonTrend() {
   const data = await loadAttendance();
   return data.seasons
-    .filter(s => s.year <= 2025)
     .map(s => ({ year: s.year, avg: s.avg, total: s.total, games: s.games }));
 }
 
@@ -29,7 +28,7 @@ export async function getTeamAttendance(year) {
   const data = await loadAttendance();
   if (year === 'all') {
     const totals = {};
-    for (const season of data.seasons.filter(s => s.year <= 2025)) {
+    for (const season of data.seasons) {
       for (const t of season.teams) {
         if (!totals[t.team]) totals[t.team] = { team: t.team, name: t.name, games: 0, total: 0, trend: [] };
         totals[t.team].games += t.games;
@@ -48,5 +47,5 @@ export async function getTeamAttendance(year) {
 
 export async function getAvailableYears() {
   const data = await loadAttendance();
-  return data.seasons.filter(s => s.year <= 2025).map(s => s.year).sort((a, b) => b - a);
+  return data.seasons.map(s => s.year).sort((a, b) => b - a);
 }
