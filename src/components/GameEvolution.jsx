@@ -123,7 +123,7 @@ function StatCard({ stat, data, color }) {
       {/* Sparkline */}
       <div className="flex-1" style={{ minHeight: 80 }}>
         <ResponsiveContainer width="100%" height={80}>
-          <LineChart syncId="evolution" data={valid} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+          <LineChart syncId="evolution" data={data} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
             <XAxis dataKey="year" hide />
             <YAxis domain={['auto', 'auto']} hide />
             <Tooltip content={<ChartTooltip unit={stat.unit} />} />
@@ -133,6 +133,7 @@ function StatCard({ stat, data, color }) {
               stroke={color}
               strokeWidth={1.5}
               dot={false}
+              connectNulls={false}
               activeDot={{ r: 3, fill: color }}
             />
           </LineChart>

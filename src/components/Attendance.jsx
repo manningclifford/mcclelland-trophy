@@ -5,21 +5,62 @@ import {
 import { getSeasonTrend, getTeamAttendance, getAvailableYears } from '../services/attendanceApi';
 import { getTeamInfo } from '../data/teams';
 
-function Sparkline({ data, color }) {
+function Sparkline({ data, color, minYear, maxYear, hoveredYear, onHoverYear }) {
   if (!data?.length) return null;
-  const W = 96, H = 28, PAD = 2;
+
+  const W = 180, H = 40, PAD = 3;
   const avgs = data.map(d => d.avg);
-  const min = Math.min(...avgs), max = Math.max(...avgs);
-  const range = max - min || 1;
-  const pts = data.map((d, i) => {
-    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
-    const y = PAD + (1 - (d.avg - min) / range) * (H - PAD * 2);
-    return `${x},${y}`;
-  }).join(' ');
+  const minV = Math.min(...avgs), maxV = Math.max(...avgs);
+  const rangeV = maxV - minV || 1;
+  const yearSpan = maxYear - minYear || 1;
+
+  const toX = yr => PAD + ((yr - minYear) / yearSpan) * (W - PAD * 2);
+  const toY = avg => PAD + (1 - (avg - minV) / rangeV) * (H - PAD * 2);
+
+  const pts = data.map(d => `${toX(d.year)},${toY(d.avg)}`).join(' ');
+
+  const handleMouseMove = e => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    let closest = null, best = Infinity;
+    for (const d of data) {
+      const dist = Math.abs(toX(d.year) - mx);
+      if (dist < best) { best = dist; closest = d; }
+    }
+    if (closest) onHoverYear(closest.year);
+  };
+
+  const hoveredPoint = hoveredYear != null ? data.find(d => d.year === hoveredYear) : null;
+  const tipX = hoveredPoint ? Math.max(28, Math.min(toX(hoveredPoint.year), W - 28)) : 0;
+
   return (
-    <svg width={W} height={H} className="overflow-visible">
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeOpacity="0.7" strokeLinejoin="round" strokeLinecap="round" />
-    </svg>
+    <div className="relative" style={{ width: W }}>
+      <svg
+        width={W} height={H}
+        className="overflow-visible cursor-crosshair block"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => onHoverYear(null)}
+      >
+        <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeOpacity="0.65"
+          strokeLinejoin="round" strokeLinecap="round" />
+        {hoveredPoint && (
+          <>
+            <line x1={toX(hoveredPoint.year)} y1={0} x2={toX(hoveredPoint.year)} y2={H}
+              stroke="#a8a29e" strokeWidth="1" strokeOpacity="0.5" />
+            <circle cx={toX(hoveredPoint.year)} cy={toY(hoveredPoint.avg)} r="3" fill={color} />
+          </>
+        )}
+      </svg>
+      {hoveredPoint && (
+        <div
+          className="absolute bottom-full mb-1.5 bg-white border border-stone-200 px-2 py-1 text-xs shadow-sm whitespace-nowrap pointer-events-none z-20"
+          style={{ left: tipX, transform: 'translateX(-50%)' }}
+        >
+          <span className="text-stone-500">{hoveredPoint.year}</span>
+          <span className="ml-1.5 font-semibold text-stone-900">{hoveredPoint.avg.toLocaleString()}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -38,6 +79,7 @@ export default function Attendance() {
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(null);
   const [teamData, setTeamData] = useState([]);
+  const [hoveredYear, setHoveredYear] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -83,6 +125,8 @@ export default function Attendance() {
 
   const peakSeason = trend.reduce((best, s) => s.avg > (best?.avg ?? 0) ? s : best, null);
   const latestSeason = trend[trend.length - 1];
+  const sparkMinYear = trend.length ? trend[0].year : 1965;
+  const sparkMaxYear = trend.length ? trend[trend.length - 1].year : 2025;
 
   return (
     <div className="space-y-10">
@@ -168,12 +212,12 @@ export default function Attendance() {
                   <th className="py-2 px-4 text-center text-xs font-semibold text-stone-500 uppercase tracking-wider">Games</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider">Total</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider">Average</th>
-                  {selectedYear === 'all' && (
-                    <th className="py-2 px-4 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Trend</th>
-                  )}
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider w-48">
                     <span className="sr-only">Bar</span>
                   </th>
+                  {selectedYear === 'all' && (
+                    <th className="py-2 px-4 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Trend</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -185,22 +229,17 @@ export default function Attendance() {
                     const barPct = maxAvg > 0 ? (row.avg / maxAvg) * 100 : 0;
                     return (
                       <tr key={row.team} className="border-b border-stone-100 hover:bg-stone-50">
-                        <td className="py-2 px-4 text-xs text-stone-400 tabular-nums">{idx + 1}</td>
-                        <td className="py-2 px-4">
+                        <td className="py-4 px-4 text-xs text-stone-400 tabular-nums">{idx + 1}</td>
+                        <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: info.colors.primary }} />
                             <span className="text-sm font-medium text-stone-800">{info.name}</span>
                           </div>
                         </td>
-                        <td className="py-2 px-4 text-center text-sm text-stone-500 tabular-nums">{row.games}</td>
-                        <td className="py-2 px-4 text-right text-sm text-stone-600 tabular-nums">{row.total.toLocaleString()}</td>
-                        <td className="py-2 px-4 text-right text-sm font-semibold text-stone-900 tabular-nums">{row.avg.toLocaleString()}</td>
-                        {selectedYear === 'all' && (
-                          <td className="py-2 px-4">
-                            <Sparkline data={row.trend} color={info.colors.primary} />
-                          </td>
-                        )}
-                        <td className="py-2 px-4">
+                        <td className="py-4 px-4 text-center text-sm text-stone-500 tabular-nums">{row.games}</td>
+                        <td className="py-4 px-4 text-right text-sm text-stone-600 tabular-nums">{row.total.toLocaleString()}</td>
+                        <td className="py-4 px-4 text-right text-sm font-semibold text-stone-900 tabular-nums">{row.avg.toLocaleString()}</td>
+                        <td className="py-4 px-4">
                           <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all"
@@ -208,6 +247,18 @@ export default function Attendance() {
                             />
                           </div>
                         </td>
+                        {selectedYear === 'all' && (
+                          <td className="py-4 px-4 overflow-visible">
+                            <Sparkline
+                              data={row.trend}
+                              color={info.colors.primary}
+                              minYear={sparkMinYear}
+                              maxYear={sparkMaxYear}
+                              hoveredYear={hoveredYear}
+                              onHoverYear={setHoveredYear}
+                            />
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
