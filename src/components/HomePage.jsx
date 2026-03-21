@@ -1,72 +1,190 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getLinearTitleMeta } from '../services/linearTitleApi';
+import { loadGameEvolution } from '../services/gameEvolutionApi';
+import { getSeasonTrend } from '../services/attendanceApi';
+import { getAlltimeTotals } from '../services/alltimeMensApi';
+import { getTeamInfo } from '../data/teams';
+import TeamLogo from './TeamLogo';
 
-const FEATURES = [
-  {
-    path: '/linear-title',
-    title: 'Brunswick Street Shield',
-    description: 'Named after Brunswick Street Oval, site of the first VFL game in 1897 — a challenger title that passes between clubs on the field. It only changes hands when the holder is beaten.',
-    label: 'Title history',
-  },
-  {
-    path: '/game-evolution',
-    title: 'Change in the Game',
-    description: 'How has AFL football changed since 1990? Scoring, margins, disposals, tackles, clearances and more — tracked across every modern season.',
-    label: 'Historical trends',
-  },
-  {
-    path: '/mcclelland',
-    title: 'McClelland Trophy',
-    description: 'Which AFL club has the best combined performance across both AFL and AFLW? Track the McClelland Trophy standings from 2017 to today.',
-    label: 'Combined standings',
-  },
-  {
-    path: '/worm-similarity',
-    title: 'Worm Similarity',
-    description: 'Pick any AFL game and find the historical match with the most similar scoring worm. Explore the 50 most similar game pairs across 2012-2026.',
-    label: 'Game comparison',
-  },
-  {
-    path: '/attendance',
-    title: 'Attendance',
-    description: 'How have crowd numbers changed since 1965? Season averages, per-club breakdowns, and the full history of who fills the stands.',
-    label: 'Crowds',
-  },
-  {
-    path: '/alltime-ladder',
-    title: 'Meta Premiership',
-    description: 'Every regular-season game since the first VFL match in 1897, aggregated into a single ladder. Which club has the best win record across 130 years of football?',
-    label: 'Since 1897',
-  },
-];
+function Sparkline({ data, valueKey = 'avg', color = '#a8a29e', width = 80, height = 32 }) {
+  if (!data || data.length < 2) return null;
+  const values = data.map(d => d[valueKey]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * width;
+    const y = height - 2 - ((v - min) / range) * (height - 4);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return (
+    <svg width={width} height={height} className="overflow-visible flex-shrink-0">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Stat section with fixed height so all cards are uniform
+function Stat({ children, className = '' }) {
+  return (
+    <div className={`h-20 px-5 flex items-center border-t border-stone-100 bg-stone-50 ${className}`}>
+      {children}
+    </div>
+  );
+}
 
 export default function HomePage({ onNavigate }) {
-  return (
-    <div>
-      <div className="text-center mb-10 pb-8 border-b border-stone-300">
-        <p className="text-stone-500 max-w-lg mx-auto leading-relaxed">
-          A collection of tools exploring the curious corners of Australian football through data.
-        </p>
-      </div>
+  const [shield, setShield] = useState(null);
+  const [evolution, setEvolution] = useState(null);
+  const [attendance, setAttendance] = useState(null);
+  const [alltime, setAlltime] = useState(null);
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {FEATURES.map(({ path, title, description, label, icon }) => (
-          <button
-            key={path}
-            onClick={() => onNavigate(path)}
-            className="text-left bg-white border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all duration-200 group"
-          >
-            <div className="px-6 pt-6 pb-5 border-b border-stone-100">
-              <h3 className="display-font text-xl font-bold text-stone-900 group-hover:underline">
-                {title}
-              </h3>
-              <p className="text-stone-400 text-xs tracking-wider uppercase mt-1">{label}</p>
-            </div>
-            <div className="px-6 py-4">
-              <p className="text-stone-600 text-sm leading-relaxed">{description}</p>
-            </div>
-          </button>
-        ))}
-      </div>
+  useEffect(() => {
+    getLinearTitleMeta().then(setShield).catch(() => {});
+    loadGameEvolution().then(d => setEvolution(d.seasons)).catch(() => {});
+    getSeasonTrend().then(setAttendance).catch(() => {});
+    getAlltimeTotals().then(setAlltime).catch(() => {});
+  }, []);
+
+  const holderInfo = shield ? getTeamInfo(shield.currentHolder) : null;
+  const evLatest = evolution?.at(-1);
+  const evFirst = evolution?.[0];
+  const latestAttendance = attendance?.at(-1);
+  const alltimeLeader = alltime?.[0];
+  const alltimeLeaderInfo = alltimeLeader ? getTeamInfo(alltimeLeader.team) : null;
+  const brisbaneInfo = getTeamInfo('brisbane');
+
+  const cards = [
+    {
+      path: '/linear-title',
+      title: 'Brunswick St Shield',
+      label: 'Title history',
+      description: 'A challenger belt for Australian football — passes between clubs every time the holder is beaten.',
+      stat: (
+        <Stat>
+          {holderInfo ? (
+            <>
+              <TeamLogo teamKey={shield.currentHolder} size="sm" />
+              <div className="ml-3 min-w-0">
+                <p className="text-xs text-stone-400 uppercase tracking-widest">Current holder</p>
+                <p className="font-bold text-stone-900 truncate">{holderInfo.name}</p>
+                <p className="text-xs text-stone-500">{shield.currentDefenses + 1}-game winning streak</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-8 w-40 bg-stone-200 rounded animate-pulse" />
+          )}
+        </Stat>
+      ),
+    },
+    {
+      path: '/mcclelland',
+      title: 'McLelland Trophy',
+      label: 'Combined standings',
+      description: 'Best combined record across AFL and AFLW. Track the standings from 2017 to today.',
+      stat: (
+        <Stat>
+          <TeamLogo teamKey="brisbane" size="sm" />
+          <div className="ml-3 min-w-0">
+            <p className="text-xs text-stone-400 uppercase tracking-widest">2025 winner</p>
+            <p className="font-bold text-stone-900">{brisbaneInfo.name} · 112 pts</p>
+            <p className="text-xs text-stone-500">AFL 48 · AFLW 64</p>
+          </div>
+        </Stat>
+      ),
+    },
+    {
+      path: '/game-evolution',
+      title: 'Game Changes',
+      label: 'Historical trends',
+      description: 'Scoring, margins, disposals, tackles and more — every season since 1990.',
+      stat: (
+        <Stat className="justify-between">
+          <div className="min-w-0">
+            <p className="text-xs text-stone-400 uppercase tracking-widest">Avg total score</p>
+            {evLatest ? (
+              <>
+                <p className="font-bold text-stone-900">{Math.round(evLatest.avgTotalScore)} pts in {evLatest.year}</p>
+                {evFirst && <p className="text-xs text-stone-500">vs {Math.round(evFirst.avgTotalScore)} in {evFirst.year}</p>}
+              </>
+            ) : <div className="h-5 w-32 bg-stone-200 rounded animate-pulse mt-1" />}
+          </div>
+          {evolution && <Sparkline data={evolution} valueKey="avgTotalScore" />}
+        </Stat>
+      ),
+    },
+    {
+      path: '/worm-similarity',
+      title: 'Similar Worms',
+      label: 'Game comparison',
+      description: 'Find the historical AFL game with the most similar scoring worm to any match, 2012–2026.',
+      stat: (
+        <Stat>
+          <div>
+            <p className="text-xs text-stone-400 uppercase tracking-widest">Database</p>
+            <p className="font-bold text-stone-900">2,808 games indexed</p>
+            <p className="text-xs text-stone-500">2012–2026 · by worm similarity</p>
+          </div>
+        </Stat>
+      ),
+    },
+    {
+      path: '/attendance',
+      title: 'Attendance Data',
+      label: 'Crowds',
+      description: 'Season averages, per-club breakdowns, and the full crowd history since 1965.',
+      stat: (
+        <Stat className="justify-between">
+          <div className="min-w-0">
+            <p className="text-xs text-stone-400 uppercase tracking-widest">Avg crowd</p>
+            {latestAttendance ? (
+              <p className="font-bold text-stone-900">{latestAttendance.avg.toLocaleString()} in {latestAttendance.year}</p>
+            ) : <div className="h-5 w-32 bg-stone-200 rounded animate-pulse mt-1" />}
+          </div>
+          {attendance && <Sparkline data={attendance} valueKey="avg" />}
+        </Stat>
+      ),
+    },
+    {
+      path: '/alltime-ladder',
+      title: 'Meta Prems',
+      label: 'Since 1897',
+      description: 'Every regular-season game since 1897 on one ladder. Who leads across 130 years?',
+      stat: (
+        <Stat>
+          {alltimeLeaderInfo ? (
+            <>
+              <TeamLogo teamKey={alltimeLeader.team} size="sm" />
+              <div className="ml-3 min-w-0">
+                <p className="text-xs text-stone-400 uppercase tracking-widest">All-time leader</p>
+                <p className="font-bold text-stone-900 truncate">{alltimeLeaderInfo.name}</p>
+                <p className="text-xs text-stone-500">{alltimeLeader.winPct}% win rate · {alltimeLeader.wins.toLocaleString()} wins</p>
+              </div>
+            </>
+          ) : <div className="h-8 w-40 bg-stone-200 rounded animate-pulse" />}
+        </Stat>
+      ),
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      {cards.map(({ path, title, label, description, stat }) => (
+        <button
+          key={path}
+          onClick={() => onNavigate(path)}
+          className="text-left bg-white border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all duration-200 group w-full flex flex-col"
+        >
+          <div className="px-5 pt-5 pb-2">
+            <h3 className="display-font text-lg font-bold text-stone-900 group-hover:underline leading-tight">{title}</h3>
+            <p className="text-stone-400 text-xs tracking-wider uppercase mt-1">{label}</p>
+          </div>
+          <div className="px-5 py-3 flex-1">
+            <p className="text-stone-600 text-sm leading-relaxed line-clamp-2">{description}</p>
+          </div>
+          {stat}
+        </button>
+      ))}
     </div>
   );
 }

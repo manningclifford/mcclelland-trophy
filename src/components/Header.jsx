@@ -7,12 +7,12 @@ const TEAMS = [
 ];
 
 const SECTIONS = [
-  { path: '/linear-title', label: 'Brunswick Street Shield' },
-  { path: '/game-evolution', label: 'Change in the Game' },
-  { path: '/mcclelland', label: 'McClelland Trophy' },
-  { path: '/worm-similarity', label: 'Worm Similarity' },
-  { path: '/attendance', label: 'Attendance Trends' },
-  { path: '/alltime-ladder', label: 'Meta Premiership' },
+  { path: '/linear-title', label: 'Brunswick St Shield' },
+  { path: '/game-evolution', label: 'Game Changes' },
+  { path: '/mcclelland', label: 'McLelland Trophy' },
+  { path: '/worm-similarity', label: 'Similar Worms' },
+  { path: '/attendance', label: 'Attendance Data' },
+  { path: '/alltime-ladder', label: 'Meta Prems' },
 ];
 
 export default function Header({ route, onNavigate }) {
