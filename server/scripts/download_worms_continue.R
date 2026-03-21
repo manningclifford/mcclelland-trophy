@@ -19,7 +19,7 @@ if (file.exists(OUTPUT_FILE)) {
 existing_seasons <- unique(sapply(all_worms, function(w) w$season))
 cat("Already have seasons:", paste(sort(existing_seasons), collapse = ", "), "\n")
 
-SEASONS <- 2017:2025
+SEASONS <- 2017:2026
 
 for (season in SEASONS) {
   if (season %in% existing_seasons) {

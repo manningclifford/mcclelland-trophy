@@ -10,7 +10,7 @@ library(jsonlite)
 OUTPUT_FILE <- "server/worm_cache.json"
 cat("Output file:", OUTPUT_FILE, "\n")
 
-SEASONS <- 2012:2025
+SEASONS <- 2012:2026
 
 all_worms <- list()
 

@@ -88,6 +88,7 @@ function HolderCard({ teamKey, defenses, totalChanges, firstYear, wonFromEvent, 
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1">Current Brunswick Street Shield Holder</p>
           <h2 className="display-font text-2xl font-black text-stone-900">{info.name}</h2>
+          <p className="text-sm text-stone-500 mt-0.5">{defenses + 1}-game winning streak with the Shield</p>
         </div>
         <div className="text-right hidden sm:block flex-shrink-0">
           <p className="display-font text-3xl font-black text-stone-900">{totalChanges.toLocaleString()}</p>

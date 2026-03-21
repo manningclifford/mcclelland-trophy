@@ -155,6 +155,7 @@ function App() {
           <WormSimilarity />
         </main>
       )}
+
     </div>
   );
 }

@@ -19,7 +19,10 @@ export default function Header({ route, onNavigate }) {
   const mastheadTitleRef = useRef(null);
   const mastheadSubtitleRef = useRef(null);
   const navTitleRef = useRef(null);
+  const navBarRef = useRef(null);
+  const navLinksRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [useHamburger, setUseHamburger] = useState(false);
 
   useEffect(() => {
     let rafId = null;
@@ -54,6 +57,29 @@ export default function Header({ route, onNavigate }) {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
+
+  // Detect when title would collide with nav items and switch to hamburger
+  useEffect(() => {
+    const check = () => {
+      if (!navBarRef.current || !navLinksRef.current || !navTitleRef.current) return;
+      const barWidth = navBarRef.current.getBoundingClientRect().width;
+      const titleWidth = navTitleRef.current.getBoundingClientRect().width;
+      const navWidth = navLinksRef.current.scrollWidth;
+      // Nav is centered; calculate where its left edge sits
+      const navStart = (barWidth - navWidth) / 2;
+      // Switch to hamburger when title (at left:16px) would touch the nav (with 16px gap)
+      setUseHamburger(16 + titleWidth + 16 > navStart);
+    };
+    const ro = new ResizeObserver(check);
+    if (navBarRef.current) ro.observe(navBarRef.current);
+    check();
+    return () => ro.disconnect();
+  }, []);
+
+  // Close menu when switching back to desktop nav
+  useEffect(() => {
+    if (!useHamburger) setMenuOpen(false);
+  }, [useHamburger]);
 
   return (
     <>
@@ -111,64 +137,70 @@ export default function Header({ route, onNavigate }) {
       </div>
 
       {/* Sticky nav — direct child of the app wrapper so sticky always works */}
-      <div className="bg-stone-50 sticky top-0 z-50 border-b border-stone-300 relative">
-        {/* Title — anchored to the far left of the full-width bar */}
-        <a
-          ref={navTitleRef}
-          href="#/"
-          onClick={(e) => { e.preventDefault(); onNavigate('/'); }}
-          className="display-font font-black tracking-tight text-stone-900 text-sm absolute left-4 top-1/2 whitespace-nowrap hover:opacity-70"
-          style={{ opacity: 0, transform: 'translateY(-50%) translateX(-12px)', willChange: 'transform, opacity' }}
-        >
-          Sherrin Spreadsheets
-        </a>
-
-        {/* Mobile: hamburger button */}
-        <div className="lg:hidden flex justify-end px-4">
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            className="py-3 text-stone-500 hover:text-stone-900 transition-colors"
-            aria-label="Toggle menu"
+      <div className="bg-stone-50 sticky top-0 z-50 border-b border-stone-300">
+        {/* Top bar row — title is absolute within this row only, so the dropdown below doesn't shift it */}
+        <div ref={navBarRef} className="relative">
+          {/* Title — anchored to the far left of the top bar row */}
+          <a
+            ref={navTitleRef}
+            href="#/"
+            onClick={(e) => { e.preventDefault(); onNavigate('/'); }}
+            className="display-font font-black tracking-tight text-stone-900 text-sm absolute left-4 top-1/2 whitespace-nowrap hover:opacity-70"
+            style={{ opacity: 0, transform: 'translateY(-50%) translateX(-12px)', willChange: 'transform, opacity' }}
           >
-            {menuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+            Sherrin Spreadsheets
+          </a>
+
+          {/* Nav links — always rendered so ResizeObserver can measure natural width; hidden when hamburger active */}
+          <div
+            className="max-w-6xl mx-auto px-4"
+            style={{ visibility: useHamburger ? 'hidden' : 'visible', pointerEvents: useHamburger ? 'none' : 'auto' }}
+          >
+            <nav ref={navLinksRef} className="flex justify-center">
+              {SECTIONS.map(({ path, label }, i) => (
+                <React.Fragment key={path}>
+                  {i > 0 && (
+                    <span className="text-stone-300 self-center text-xs select-none">|</span>
+                  )}
+                  <a
+                    href={`#${path}`}
+                    onClick={(e) => { e.preventDefault(); onNavigate(path); }}
+                    className={`px-4 py-3 text-xs font-semibold tracking-widest uppercase transition-colors ${
+                      route === path
+                        ? 'text-stone-900 border-b-2 border-stone-900'
+                        : 'text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    {label}
+                  </a>
+                </React.Fragment>
+              ))}
+            </nav>
+          </div>
+
+          {/* Hamburger button — shown when nav would collide with title */}
+          {useHamburger && (
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 py-3 text-stone-500 hover:text-stone-900 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          )}
         </div>
 
-        {/* Desktop: horizontal nav links */}
-        <div className="hidden lg:block max-w-6xl mx-auto px-4">
-          <nav className="flex justify-center">
-            {SECTIONS.map(({ path, label }, i) => (
-              <React.Fragment key={path}>
-                {i > 0 && (
-                  <span className="text-stone-300 self-center text-xs select-none">|</span>
-                )}
-                <a
-                  href={`#${path}`}
-                  onClick={(e) => { e.preventDefault(); onNavigate(path); }}
-                  className={`px-4 py-3 text-xs font-semibold tracking-widest uppercase transition-colors ${
-                    route === path
-                      ? 'text-stone-900 border-b-2 border-stone-900'
-                      : 'text-stone-500 hover:text-stone-800'
-                  }`}
-                >
-                  {label}
-                </a>
-              </React.Fragment>
-            ))}
-          </nav>
-        </div>
-
-        {/* Mobile: dropdown menu */}
-        {menuOpen && (
-          <div className="lg:hidden border-t border-stone-200 bg-stone-50">
+        {/* Dropdown — outside the top bar row so it doesn't affect the title's top-1/2 position */}
+        {useHamburger && menuOpen && (
+          <div className="border-t border-stone-200 bg-stone-50">
             {SECTIONS.map(({ path, label }) => (
               <a
                 key={path}

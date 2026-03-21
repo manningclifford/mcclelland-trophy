@@ -4,6 +4,11 @@ import { getTeamKey } from '../services/teamMap.js';
 
 const router = Router();
 
+// Convert compact margins array to {time, margin} objects for the frontend
+function expandMargins(margins) {
+  return margins.map((margin, i) => ({ time: i, margin }));
+}
+
 // GET /api/matches/:matchId/worm
 router.get('/matches/:matchId/worm', (req, res) => {
   const matchId = req.params.matchId;
@@ -21,7 +26,7 @@ router.get('/matches/:matchId/worm', (req, res) => {
     awayTeam: getTeamKey(entry.awayTeam),
     homeTeamName: entry.homeTeam,
     awayTeamName: entry.awayTeam,
-    worm: entry.worm,
+    worm: expandMargins(entry.margins),
     maxAbsMargin: entry.maxAbsMargin,
   });
 });
@@ -48,7 +53,7 @@ router.get('/matches/:matchId/similar', (req, res) => {
     awayTeam: getTeamKey(m.awayTeam),
     homeTeamName: m.homeTeam,
     awayTeamName: m.awayTeam,
-    worm: m.worm,
+    worm: expandMargins(m.margins),
     similarity: result.score,
   });
 });

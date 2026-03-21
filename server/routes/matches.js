@@ -30,10 +30,9 @@ router.get('/seasons/:year/rounds/:round/matches', (req, res) => {
       awayTeam: getTeamKey(m.awayTeam),
       homeTeamName: m.homeTeam,
       awayTeamName: m.awayTeam,
-      homeScore: m.worm[m.worm.length - 1]?.margin > 0
-        ? null : null, // We don't have separate scores, just margin
+      homeScore: null, // We don't have separate scores, just margin
       awayScore: null,
-      finalMargin: m.worm[m.worm.length - 1]?.margin,
+      finalMargin: m.margins[m.margins.length - 1] ?? null,
     })),
   });
 });
