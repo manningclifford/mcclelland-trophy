@@ -35,7 +35,7 @@ export default function Attendance() {
   }, []);
 
   useEffect(() => {
-    if (!selectedYear) return;
+    if (selectedYear === null) return;
     getTeamAttendance(selectedYear).then(setTeamData).catch(() => {});
   }, [selectedYear]);
 
@@ -133,9 +133,10 @@ export default function Attendance() {
             <span className="text-sm text-stone-600">Season</span>
             <select
               value={selectedYear ?? ''}
-              onChange={e => setSelectedYear(Number(e.target.value))}
+              onChange={e => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
               className="px-3 py-1.5 border border-stone-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
             >
+              <option value="all">All time</option>
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
@@ -190,7 +191,10 @@ export default function Attendance() {
         </div>
       </section>
 
-      <p className="text-xs text-stone-400 text-center pb-4">Includes home-and-away and finals. Source: Footywire.</p>
+      <div className="text-xs text-stone-400 text-center pb-4 space-y-1">
+        <p>Includes home-and-away games and finals. Source: Footywire.</p>
+        <p>* South Melbourne (renamed the Sydney Swans in 1982) is combined under Sydney.</p>
+      </div>
     </div>
   );
 }

@@ -34,7 +34,7 @@ const TEAM_NAME_MAP = {
   'Port Adelaide Power': 'portadelaide',
   'Richmond Tigers': 'richmond',
   'St Kilda Saints': 'stkilda',
-  'Sydney Swans': 'sydney',
+  'Sydney Swans': 'sydney', 'South Melbourne Swans': 'sydney', 'South Melbourne': 'sydney',
   'West Coast Eagles': 'westcoast',
   'Western Bulldogs': 'westernbulldogs',
   'Fitzroy Lions': 'fitzroy',
