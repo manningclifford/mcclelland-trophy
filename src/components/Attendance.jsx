@@ -5,6 +5,24 @@ import {
 import { getSeasonTrend, getTeamAttendance, getAvailableYears } from '../services/attendanceApi';
 import { getTeamInfo } from '../data/teams';
 
+function Sparkline({ data, color }) {
+  if (!data?.length) return null;
+  const W = 96, H = 28, PAD = 2;
+  const avgs = data.map(d => d.avg);
+  const min = Math.min(...avgs), max = Math.max(...avgs);
+  const range = max - min || 1;
+  const pts = data.map((d, i) => {
+    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
+    const y = PAD + (1 - (d.avg - min) / range) * (H - PAD * 2);
+    return `${x},${y}`;
+  }).join(' ');
+  return (
+    <svg width={W} height={H} className="overflow-visible">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeOpacity="0.7" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -28,7 +46,7 @@ export default function Attendance() {
       .then(([t, y]) => {
         setTrend(t);
         setYears(y);
-        setSelectedYear(y[0]);
+        setSelectedYear('all');
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
@@ -150,6 +168,9 @@ export default function Attendance() {
                   <th className="py-2 px-4 text-center text-xs font-semibold text-stone-500 uppercase tracking-wider">Games</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider">Total</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider">Average</th>
+                  {selectedYear === 'all' && (
+                    <th className="py-2 px-4 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Trend</th>
+                  )}
                   <th className="py-2 px-4 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider w-48">
                     <span className="sr-only">Bar</span>
                   </th>
@@ -174,6 +195,11 @@ export default function Attendance() {
                         <td className="py-2 px-4 text-center text-sm text-stone-500 tabular-nums">{row.games}</td>
                         <td className="py-2 px-4 text-right text-sm text-stone-600 tabular-nums">{row.total.toLocaleString()}</td>
                         <td className="py-2 px-4 text-right text-sm font-semibold text-stone-900 tabular-nums">{row.avg.toLocaleString()}</td>
+                        {selectedYear === 'all' && (
+                          <td className="py-2 px-4">
+                            <Sparkline data={row.trend} color={info.colors.primary} />
+                          </td>
+                        )}
                         <td className="py-2 px-4">
                           <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                             <div

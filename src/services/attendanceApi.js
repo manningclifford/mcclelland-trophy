@@ -31,9 +31,10 @@ export async function getTeamAttendance(year) {
     const totals = {};
     for (const season of data.seasons.filter(s => s.year <= 2025)) {
       for (const t of season.teams) {
-        if (!totals[t.team]) totals[t.team] = { team: t.team, name: t.name, games: 0, total: 0 };
+        if (!totals[t.team]) totals[t.team] = { team: t.team, name: t.name, games: 0, total: 0, trend: [] };
         totals[t.team].games += t.games;
         totals[t.team].total += t.total;
+        totals[t.team].trend.push({ year: season.year, avg: t.avg });
       }
     }
     return Object.values(totals).map(t => ({
