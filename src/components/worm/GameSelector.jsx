@@ -71,7 +71,7 @@ export default function GameSelector({
         >
           <option value="">{loading === 'rounds' ? 'Loading...' : 'Select round'}</option>
           {rounds.map((r) => (
-            <option key={r} value={r}>Round {r}</option>
+            <option key={r} value={r}>{r === 0 ? 'Opening Round' : `Round ${r}`}</option>
           ))}
         </select>
       </div>
