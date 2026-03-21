@@ -71,6 +71,14 @@ function StatCard({ stat, data, color }) {
   const valid = data.filter(s => s[stat.key] != null && !isNaN(s[stat.key]));
   if (valid.length < 2) return null;
 
+  // Full-length array with nulls for missing years — keeps all charts the same
+  // length so syncId aligns years correctly. Explicit null avoids NaN hitting
+  // the YAxis domain calculation and causing an infinite render loop.
+  const chartData = data.map(s => {
+    const v = s[stat.key];
+    return { year: s.year, [stat.key]: (v != null && !isNaN(v)) ? v : null };
+  });
+
   const first = valid[0];
   const last  = valid[valid.length - 1];
   const delta = ((last[stat.key] - first[stat.key]) / Math.abs(first[stat.key])) * 100;
@@ -123,7 +131,7 @@ function StatCard({ stat, data, color }) {
       {/* Sparkline */}
       <div className="flex-1" style={{ minHeight: 80 }}>
         <ResponsiveContainer width="100%" height={80}>
-          <LineChart syncId="evolution" data={data} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+          <LineChart syncId="evolution" data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
             <XAxis dataKey="year" hide />
             <YAxis domain={['auto', 'auto']} hide />
             <Tooltip content={<ChartTooltip unit={stat.unit} />} />
@@ -133,7 +141,6 @@ function StatCard({ stat, data, color }) {
               stroke={color}
               strokeWidth={1.5}
               dot={false}
-              connectNulls={false}
               activeDot={{ r: 3, fill: color }}
             />
           </LineChart>
