@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const TEAMS = [
   'adelaide','brisbane','carlton','collingwood','essendon','fremantle',
@@ -19,6 +19,7 @@ export default function Header({ route, onNavigate }) {
   const mastheadTitleRef = useRef(null);
   const mastheadSubtitleRef = useRef(null);
   const navTitleRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     let rafId = null;
@@ -121,8 +122,28 @@ export default function Header({ route, onNavigate }) {
         >
           Sherrin Spreadsheets
         </a>
-        {/* Nav links — centered in the full page width */}
-        <div className="max-w-6xl mx-auto px-4">
+
+        {/* Mobile: hamburger button */}
+        <div className="lg:hidden flex justify-end px-4">
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            className="py-3 text-stone-500 hover:text-stone-900 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Desktop: horizontal nav links */}
+        <div className="hidden lg:block max-w-6xl mx-auto px-4">
           <nav className="flex justify-center">
             {SECTIONS.map(({ path, label }, i) => (
               <React.Fragment key={path}>
@@ -144,6 +165,26 @@ export default function Header({ route, onNavigate }) {
             ))}
           </nav>
         </div>
+
+        {/* Mobile: dropdown menu */}
+        {menuOpen && (
+          <div className="lg:hidden border-t border-stone-200 bg-stone-50">
+            {SECTIONS.map(({ path, label }) => (
+              <a
+                key={path}
+                href={`#${path}`}
+                onClick={(e) => { e.preventDefault(); onNavigate(path); setMenuOpen(false); }}
+                className={`block px-6 py-3 text-xs font-semibold tracking-widest uppercase transition-colors ${
+                  route === path
+                    ? 'text-stone-900 bg-stone-100'
+                    : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100'
+                }`}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
