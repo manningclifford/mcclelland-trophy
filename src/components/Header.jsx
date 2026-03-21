@@ -11,7 +11,7 @@ const SECTIONS = [
   { path: '/game-evolution', label: 'Change in the Game' },
   { path: '/mcclelland', label: 'McClelland Trophy' },
   { path: '/worm-similarity', label: 'Worm Similarity' },
-  { path: '/attendance', label: 'Attendance' },
+  { path: '/attendance', label: 'Attendance Trends' },
   { path: '/alltime-ladder', label: 'Meta Premiership' },
 ];
 

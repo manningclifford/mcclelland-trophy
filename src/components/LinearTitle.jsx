@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getLinearTitleMeta, getAllEvents } from '../services/linearTitleApi';
+import { getLinearTitleMeta, getAllEvents, getNextContentionGame } from '../services/linearTitleApi';
 import { getTeamInfo } from '../data/teams';
 import TeamLogo from './TeamLogo';
 
@@ -102,6 +102,7 @@ export default function LinearTitle() {
   const [meta, setMeta] = useState(null);
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
+  const [nextGame, setNextGame] = useState(undefined);
   const [filterTeam, setFilterTeam] = useState('');
   const [sortCol, setSortCol] = useState('index');
   const [sortDir, setSortDir] = useState('asc');
@@ -116,6 +117,9 @@ export default function LinearTitle() {
       .then(([m, evts]) => {
         setMeta(m);
         setEvents(evts);
+        getNextContentionGame(m.currentHolder)
+          .then(setNextGame)
+          .catch(() => setNextGame(null));
       })
       .catch(err => setError(err.message));
   }, []);
@@ -223,6 +227,42 @@ export default function LinearTitle() {
         totalChanges={meta.totalChanges}
         firstYear={meta.firstYear}
       />
+
+      {/* Next contention game */}
+      {nextGame && (() => {
+        const opponentInfo = getTeamInfo(nextGame.opponentKey);
+        const dateStr = nextGame.date
+          ? new Date(nextGame.date.replace(' ', 'T')).toLocaleDateString('en-AU', {
+              weekday: 'short', day: 'numeric', month: 'short',
+              hour: 'numeric', minute: '2-digit', hour12: true,
+            })
+          : null;
+        return (
+          <div className="bg-stone-50 border border-stone-200 flex items-center gap-4 px-6 py-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-2">Next contention game</p>
+              <div className="flex items-center gap-3">
+                <TeamLogo teamKey={nextGame.opponentKey} size="md" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-stone-800">{opponentInfo.name}</span>
+                    <span className="text-xs bg-stone-200 text-stone-600 px-1.5 py-0.5">
+                      {nextGame.isHome ? 'Home' : 'Away'}
+                    </span>
+                  </div>
+                  {nextGame.venue && (
+                    <p className="text-xs text-stone-500 mt-0.5">{nextGame.venue}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <p className="text-sm font-semibold text-stone-700">{nextGame.roundName}</p>
+              {dateStr && <p className="text-xs text-stone-400 mt-0.5">{dateStr}</p>}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Recent holders */}
       {(() => {
