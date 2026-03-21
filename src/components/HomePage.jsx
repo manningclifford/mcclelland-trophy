@@ -26,6 +26,12 @@ const FEATURES = [
     label: 'Game comparison',
   },
   {
+    path: '/attendance',
+    title: 'Attendance',
+    description: 'How have crowd numbers changed since 1965? Season averages, per-club breakdowns, and the full history of who fills the stands.',
+    label: 'Crowds',
+  },
+  {
     path: '/alltime-ladder',
     title: 'Meta Premiership',
     description: 'Every regular-season game since the first VFL match in 1897, aggregated into a single ladder. Which club has the best win record across 130 years of football?',

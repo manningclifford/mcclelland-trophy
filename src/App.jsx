@@ -8,6 +8,7 @@ import GameEvolution from './components/GameEvolution';
 import WormSimilarity from './components/worm/WormSimilarity';
 import LinearTitle from './components/LinearTitle';
 import AlltimeLadder from './components/AlltimeLadder';
+import Attendance from './components/Attendance';
 import { getMcClellandStandings, clearCache } from './services/aflApi';
 import { historicalData } from './data/historical';
 
@@ -134,6 +135,12 @@ function App() {
       {route === '/linear-title' && (
         <main className="max-w-6xl mx-auto py-8 px-4">
           <LinearTitle />
+        </main>
+      )}
+
+      {route === '/attendance' && (
+        <main className="max-w-6xl mx-auto py-8 px-4">
+          <Attendance />
         </main>
       )}
 
