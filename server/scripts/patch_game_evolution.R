@@ -2,6 +2,9 @@
 # Patch game_evolution.json — fetches only years missing from the existing file.
 # Run from repo root: Rscript server/scripts/patch_game_evolution.R
 
+local_lib <- Sys.getenv("R_LIBS_USER", unset = "")
+if (nchar(local_lib) > 0) .libPaths(c(local_lib, .libPaths()))
+
 library(fitzRoy)
 library(jsonlite)
 

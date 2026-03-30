@@ -6,6 +6,9 @@
 # Usage: Rscript server/scripts/fetch_worms_year.R [year]
 #        year defaults to current year
 
+local_lib <- Sys.getenv("R_LIBS_USER", unset = "")
+if (nchar(local_lib) > 0) .libPaths(c(local_lib, .libPaths()))
+
 library(fitzRoy)
 library(jsonlite)
 
