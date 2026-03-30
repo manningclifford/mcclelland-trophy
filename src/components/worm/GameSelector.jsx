@@ -29,7 +29,7 @@ export default function GameSelector({
   }, [selectedSeason]);
 
   useEffect(() => {
-    if (!selectedSeason || !selectedRound) { setMatches([]); return; }
+    if (selectedSeason == null || selectedRound == null) { setMatches([]); return; }
     setLoading('matches');
     fetchMatches(selectedSeason, selectedRound)
       .then(setMatches)
@@ -82,7 +82,7 @@ export default function GameSelector({
           id="worm-match"
           value={selectedMatch || ''}
           onChange={(e) => onMatchChange(e.target.value || null)}
-          disabled={!selectedRound || loading === 'matches'}
+          disabled={selectedRound == null || loading === 'matches'}
           className="px-3 py-2 border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 text-sm disabled:bg-stone-100 disabled:cursor-not-allowed"
         >
           <option value="">{loading === 'matches' ? 'Loading...' : 'Select match'}</option>
