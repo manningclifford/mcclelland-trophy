@@ -20,16 +20,14 @@ existing_years <- sapply(existing$seasons, function(s) s$year)
 cat(sprintf("Existing seasons: %d (%d–%d)\n", length(existing_years),
             min(existing_years), max(existing_years)))
 
-missing_years <- setdiff(FIRST_YEAR:LAST_YEAR, existing_years)
-cat(sprintf("Missing years: %s\n\n", paste(missing_years, collapse = ", ")))
+# Always refresh the current year (season in progress); add any missing years too
+refresh_years <- union(setdiff(FIRST_YEAR:LAST_YEAR, existing_years), LAST_YEAR)
+cat(sprintf("Years to fetch: %s\n\n", paste(refresh_years, collapse = ", ")))
 
-if (length(missing_years) == 0) {
-  cat("Nothing to patch.\n"); quit(save = "no")
-}
+# Remove existing entries for years we're about to re-fetch
+seasons_list <- existing$seasons[!sapply(existing$seasons, function(s) s$year %in% refresh_years)]
 
-seasons_list <- existing$seasons
-
-for (year in missing_years) {
+for (year in refresh_years) {
   cat(sprintf("=== %d ===\n", year))
 
   results <- tryCatch(
