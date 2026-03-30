@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TeamLogo from './TeamLogo';
+import DataTimestamp from './DataTimestamp';
 
 const ARCHETYPE_META = {
   control:  { label: 'Territory Control',  color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
@@ -302,6 +303,7 @@ export default function StyleTaxonomy() {
       <p className="text-xs text-stone-400 border-t border-stone-100 pt-4">
         Data: AFL Tables season aggregates · Squiggle ratings · {data.year} season ({data.teams[0]?.games} rounds)
       </p>
+      <DataTimestamp generatedAt={data.generatedAt} />
     </div>
   );
 }

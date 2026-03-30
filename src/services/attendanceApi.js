@@ -49,3 +49,8 @@ export async function getAvailableYears() {
   const data = await loadAttendance();
   return data.seasons.map(s => s.year).sort((a, b) => b - a);
 }
+
+export async function getAttendanceGeneratedAt() {
+  const data = await loadAttendance();
+  return data.generatedAt ?? null;
+}

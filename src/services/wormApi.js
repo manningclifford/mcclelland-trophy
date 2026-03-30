@@ -57,6 +57,11 @@ function formatMatch(m) {
   };
 }
 
+export async function fetchGeneratedAt() {
+  const data = await loadCache();
+  return data.generatedAt ?? null;
+}
+
 export async function fetchSeasons() {
   const { matches } = await loadCache();
   const seasons = [...new Set(matches.map(m => m.season))].sort((a, b) => b - a);

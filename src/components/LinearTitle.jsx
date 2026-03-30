@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getLinearTitleMeta, getAllEvents, getShieldSchedule } from '../services/linearTitleApi';
 import { getTeamInfo } from '../data/teams';
 import TeamLogo from './TeamLogo';
+import DataTimestamp from './DataTimestamp';
 
 function InfoRow({ label, children }) {
   return (
@@ -454,7 +455,8 @@ export default function LinearTitle() {
       </div>
       </section>
 
-      <p className="text-xs text-stone-400 text-center pb-4">Source: Squiggle API.</p>
+      <p className="text-xs text-stone-400 text-center">Source: Squiggle API.</p>
+      <DataTimestamp generatedAt={meta?.generatedAt} />
     </div>
   );
 }

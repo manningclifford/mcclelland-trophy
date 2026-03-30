@@ -28,6 +28,7 @@ export async function getLinearTitleMeta() {
     firstYear: data.firstYear,
     lastYear: data.lastYear,
     teamStats: data.teamStats,
+    generatedAt: data.generatedAt ?? null,
   };
 }
 

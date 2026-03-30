@@ -2,13 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import GameSelector from './GameSelector';
 import WormComparison from './WormComparison';
 import MostSimilarList from './MostSimilarList';
-import { fetchRandom } from '../../services/wormApi';
+import { fetchRandom, fetchGeneratedAt } from '../../services/wormApi';
+import DataTimestamp from '../DataTimestamp';
 
 export default function WormSimilarity() {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [selectedRound, setSelectedRound] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [generatedAt, setGeneratedAt] = useState(null);
   const topRef = useRef(null);
+
+  useEffect(() => {
+    fetchGeneratedAt().then(setGeneratedAt).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchRandom()
@@ -99,7 +105,8 @@ export default function WormSimilarity() {
         <MostSimilarList onSelectPair={handleSelectPair} />
       </section>
 
-      <p className="text-xs text-stone-400 text-center pb-4">Source: Squiggle API. Covers home-and-away and finals, 2012–2026.</p>
+      <p className="text-xs text-stone-400 text-center">Source: Squiggle API. Covers home-and-away and finals, 2012–2026.</p>
+      <DataTimestamp generatedAt={generatedAt} />
     </div>
   );
 }

@@ -83,12 +83,24 @@ jobs:
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: node server/scripts/patchAttendanceYear.js
 
+      - name: Patch linear title for current year
+        if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
+        run: node server/scripts/patchLinearTitle.js
+
+      - name: Patch all-time AFL standings for current year
+        if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
+        run: node server/scripts/patchAlltimeAFL.js
+
+      - name: Update style taxonomy for current year
+        if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
+        run: node server/scripts/buildStyleTaxonomy.js ${{ github.event.inputs.year || '' }}
+
       - name: Commit and push if data changed
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/worm_cache.json public/game_evolution.json public/attendance.json
+          git add public/worm_cache.json public/game_evolution.json public/attendance.json public/linear_title.json public/alltime_afl.json public/style_taxonomy.json
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else

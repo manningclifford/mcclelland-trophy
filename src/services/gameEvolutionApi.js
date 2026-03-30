@@ -1,5 +1,10 @@
 let cache = null;
 
+export async function getGameEvolutionGeneratedAt() {
+  const data = await loadGameEvolution();
+  return data.generatedAt ?? null;
+}
+
 export async function loadGameEvolution() {
   if (cache) return cache;
   const res = await fetch(`${import.meta.env.BASE_URL}game_evolution.json?v=${Date.now()}`);

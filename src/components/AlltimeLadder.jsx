@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { loadAlltimeMens } from '../services/alltimeMensApi';
+import { loadAlltimeMens, getAlltimeGeneratedAt } from '../services/alltimeMensApi';
+import DataTimestamp from './DataTimestamp';
 
 const AFL_FIRST_YEAR = 1990;
 
@@ -50,6 +51,11 @@ export default function AlltimeLadder() {
   const [sortDir, setSortDir] = useState('desc');
   const [showDefunct, setShowDefunct] = useState(true);
   const [aflOnly, setAflOnly] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState(null);
+
+  useEffect(() => {
+    getAlltimeGeneratedAt().then(setGeneratedAt).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -198,7 +204,8 @@ export default function AlltimeLadder() {
         </div>
       </section>
 
-      <p className="text-xs text-stone-400 text-center pb-4">Regular season games only. Source: Squiggle API.</p>
+      <p className="text-xs text-stone-400 text-center">Regular season games only. Source: Squiggle API.</p>
+      <DataTimestamp generatedAt={generatedAt} />
     </div>
   );
 }

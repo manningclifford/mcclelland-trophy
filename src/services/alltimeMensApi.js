@@ -57,6 +57,11 @@ export async function getAlltimeTotals() {
     .sort((a, b) => b.winPct - a.winPct || b.wins - a.wins);
 }
 
+export async function getAlltimeGeneratedAt() {
+  const data = await loadAlltimeMens();
+  return data.generatedAt ?? null;
+}
+
 export async function getTrophyWinners() {
   const data = await loadAlltimeMens();
   // Returns array of { year, winner, wins, losses, draws, pct }

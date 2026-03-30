@@ -125,8 +125,15 @@ async function main() {
   let holderKey = null;
   const events = [];          // every title change (including inaugural)
   const currentDefenses = {}; // defenses in current reign, per team
+  const checkpoints = {};     // year → { holder, defenses } at end of that year
+  let lastSeenSeason = null;
 
   for (const g of allGames) {
+    // Save year-end checkpoint whenever season rolls over
+    if (lastSeenSeason !== null && g.season !== lastSeenSeason && holderKey) {
+      checkpoints[lastSeenSeason] = { holder: holderKey, defenses: currentDefenses[holderKey] || 0 };
+    }
+    lastSeenSeason = g.season;
     let winnerKey = null;
     let loserKey = null;
     if (g.homeScore > g.awayScore) {
@@ -223,6 +230,11 @@ async function main() {
     }
   }
 
+  // Save checkpoint for the final season
+  if (lastSeenSeason && holderKey) {
+    checkpoints[lastSeenSeason] = { holder: holderKey, defenses: currentDefenses[holderKey] || 0 };
+  }
+
   const output = {
     currentHolder: holderKey,
     currentDefenses: currentDefenses[holderKey] || 0,
@@ -231,6 +243,7 @@ async function main() {
     lastYear: CURRENT_YEAR,
     generatedAt: new Date().toISOString(),
     failedYears,
+    checkpoints,
     teamStats,
     events,
   };

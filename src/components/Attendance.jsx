@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine,
 } from 'recharts';
-import { getSeasonTrend, getTeamAttendance, getAvailableYears } from '../services/attendanceApi';
+import { getSeasonTrend, getTeamAttendance, getAvailableYears, getAttendanceGeneratedAt } from '../services/attendanceApi';
+import DataTimestamp from './DataTimestamp';
 import { getTeamInfo } from '../data/teams';
 
 function Sparkline({ data, color, minYear, maxYear, hoveredYear, onHoverYear }) {
@@ -82,6 +83,11 @@ export default function Attendance() {
   const [hoveredYear, setHoveredYear] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [generatedAt, setGeneratedAt] = useState(null);
+
+  useEffect(() => {
+    getAttendanceGeneratedAt().then(setGeneratedAt).catch(() => {});
+  }, []);
 
   useEffect(() => {
     Promise.all([getSeasonTrend(), getAvailableYears()])
@@ -268,10 +274,11 @@ export default function Attendance() {
         </div>
       </section>
 
-      <div className="text-xs text-stone-400 text-center pb-4 space-y-1">
+      <div className="text-xs text-stone-400 text-center space-y-1">
         <p>Includes home-and-away games and finals. Source: Footywire.</p>
         <p>* South Melbourne (renamed the Sydney Swans in 1982) is combined under Sydney.</p>
       </div>
+      <DataTimestamp generatedAt={generatedAt} />
     </div>
   );
 }

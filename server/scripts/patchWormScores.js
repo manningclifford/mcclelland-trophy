@@ -97,5 +97,6 @@ for (const year of seasons) {
   console.log(`${yearPatched} patched`);
 }
 
+cache.generatedAt = new Date().toISOString();
 writeFileSync(CACHE_PATH, JSON.stringify(cache));
 console.log(`\nDone. ${patched} matches patched, ${missing} unmatched. Saved to worm_cache.json.`);

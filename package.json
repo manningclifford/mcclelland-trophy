@@ -18,7 +18,10 @@
     "patch:worm-scores": "node server/scripts/patchWormScores.js",
     "update:worms": "npm run fetch:worms && npm run merge:worms && npm run patch:worm-scores",
     "patch:attendance": "node server/scripts/patchAttendanceYear.js",
-    "build:style-taxonomy": "node server/scripts/buildStyleTaxonomy.js"
+    "patch:linear-title": "node server/scripts/patchLinearTitle.js",
+    "patch:alltime-afl": "node server/scripts/patchAlltimeAFL.js",
+    "build:style-taxonomy": "node server/scripts/buildStyleTaxonomy.js",
+    "patch:style-taxonomy": "node server/scripts/buildStyleTaxonomy.js"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

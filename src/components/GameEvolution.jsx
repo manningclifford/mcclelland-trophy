@@ -3,6 +3,7 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine,
 } from 'recharts';
 import { loadGameEvolution } from '../services/gameEvolutionApi';
+import DataTimestamp from './DataTimestamp';
 
 // ─── Stat definitions ────────────────────────────────────────────────────────
 
@@ -263,8 +264,9 @@ export default function GameEvolution() {
         {provisionalYear && (
           <p>† {provisionalYear} figures are provisional — season in progress ({raw.at(-1).gamesPlayed} games played).</p>
         )}
-        <p>Source: afltables via fitzRoy. Generated {new Date(data.generatedAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' })}.</p>
+        <p>Source: afltables via fitzRoy.</p>
       </div>
+      <DataTimestamp generatedAt={data.generatedAt} />
     </div>
   );
 }
