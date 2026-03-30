@@ -49,7 +49,7 @@ jobs:
 
       - name: Install R packages
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
-        run: Rscript -e 'if (!requireNamespace("fitzRoy", quietly=TRUE)) install.packages(c("fitzRoy","jsonlite"), repos="https://cloud.r-project.org")'
+        run: Rscript -e 'install.packages(c("fitzRoy","jsonlite"), repos="https://cloud.r-project.org", dependencies=TRUE)'
 
       - name: Set up Node
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
@@ -69,6 +69,10 @@ jobs:
       - name: Merge worms into public cache
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
         run: node server/scripts/mergeRawWorms.js
+
+      - name: Patch worm scores
+        if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
+        run: node server/scripts/patchWormScores.js
 
       - name: Patch game evolution for current year
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
