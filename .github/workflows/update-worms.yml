@@ -42,15 +42,15 @@ jobs:
 
       - name: Cache R packages
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
+        id: cache-r-pkgs
         uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: r-4.4-ubuntu-fitzRoy-jsonlite-v2
-          restore-keys: r-4.4-ubuntu-
+          key: r-4.4-ubuntu-fitzRoy-v3
 
       - name: Install R packages
-        if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
-        run: Rscript -e 'install.packages(c("fitzRoy","jsonlite"), repos="https://cloud.r-project.org", dependencies=TRUE)'
+        if: (steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch') && steps.cache-r-pkgs.outputs.cache-hit != 'true'
+        run: Rscript -e 'install.packages(c("fitzRoy","jsonlite"), repos="https://packagemanager.posit.co/cran/__linux__/jammy/latest", dependencies=NA)'
 
       - name: Set up Node
         if: steps.season_check.outputs.active == 'true' || github.event_name == 'workflow_dispatch'
