@@ -86,6 +86,17 @@ export default function Header({ route, onNavigate }) {
       {/* Non-sticky: ticker + masthead scroll away */}
       <div className="bg-white border-b border-stone-200">
         {/* Scrolling logo ticker */}
+        <style>{`
+          .ticker-logo {
+            height: 36px; width: 36px; object-fit: contain;
+            filter: grayscale(100%) opacity(35%);
+            margin: 0 20px; flex-shrink: 0;
+            transition: filter 0.2s ease;
+          }
+          .ticker-logo:hover {
+            filter: grayscale(0%) opacity(100%);
+          }
+        `}</style>
         <div className="overflow-hidden bg-white border-b border-stone-100 py-2" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
           <div style={{ display: 'flex', width: 'max-content', animation: 'ticker 40s linear infinite' }}>
             {[...TEAMS, ...TEAMS].map((team, i) => (
@@ -93,7 +104,7 @@ export default function Header({ route, onNavigate }) {
                 key={i}
                 src={`${import.meta.env.BASE_URL}teams/${team}.png`}
                 alt={team}
-                style={{ height: 36, width: 36, objectFit: 'contain', filter: 'grayscale(100%) opacity(35%)', margin: '0 20px', flexShrink: 0 }}
+                className="ticker-logo"
               />
             ))}
           </div>
