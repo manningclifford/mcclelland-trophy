@@ -86,9 +86,9 @@ function HolderCard({ teamKey, defenses, totalChanges, firstYear, wonFromEvent, 
       <div className="flex items-center gap-5 px-6 py-5">
         <TeamLogo teamKey={teamKey} size="lg" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1">Reigning Champion</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1">Current Brunswick St Belt Holder</p>
           <h2 className="display-font text-2xl font-black text-stone-900">{info.name}</h2>
-          <p className="text-sm text-stone-500 mt-0.5">{defenses + 1}-game linear title reign</p>
+          <p className="text-sm text-stone-500 mt-0.5">{defenses + 1}-game winning streak with the Belt</p>
         </div>
         <div className="text-right hidden sm:block flex-shrink-0">
           <p className="display-font text-3xl font-black text-stone-900">{totalChanges.toLocaleString()}</p>
@@ -289,9 +289,9 @@ export default function LinearTitle() {
 
       {/* Description */}
       <p className="text-stone-500 leading-relaxed">
-        The Brunswick Street reigning champion is a linear title — an unofficial championship passed from club to club,
+        The Brunswick St Belt is a reigning champion style linear title — an unofficial championship passed from club to club,
         named after Brunswick Street Oval, where the first VFL game was played in 1897. It is not awarded for finishing
-        top of the ladder, but won on the field, game by game. A club holds the title until they lose it to whoever beats them.
+        top of the ladder, but won on the field, game by game. A club holds the Belt until they lose it to whoever beats them.
         It has changed hands {meta.totalChanges.toLocaleString()} times since {meta.firstYear}.
       </p>
 
@@ -346,7 +346,7 @@ export default function LinearTitle() {
       <section>
         <div className="flex items-center gap-4 mb-4">
           <div className="h-px flex-1 bg-stone-200" />
-          <h2 className="display-font text-lg font-bold text-stone-700 uppercase tracking-widest">All-time reigning champion stats</h2>
+          <h2 className="display-font text-lg font-bold text-stone-700 uppercase tracking-widest">All-time Belt stats</h2>
           <div className="h-px flex-1 bg-stone-200" />
         </div>
         <div className="bg-white border border-stone-200 overflow-x-auto">

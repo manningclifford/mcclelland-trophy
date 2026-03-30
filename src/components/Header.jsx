@@ -7,7 +7,7 @@ const TEAMS = [
 ];
 
 const SECTIONS = [
-  { path: '/linear-title', label: 'Brunswick St Shield' },
+  { path: '/linear-title', label: 'Brunswick St Belt' },
   { path: '/game-evolution', label: 'Game Changes' },
   { path: '/mcclelland', label: 'McLelland Trophy' },
   { path: '/worm-similarity', label: 'Similar Worms' },

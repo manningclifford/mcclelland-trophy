@@ -61,9 +61,9 @@ export default function HomePage({ onNavigate }) {
   const cards = [
     {
       path: '/linear-title',
-      title: 'Brunswick St Shield',
+      title: 'Brunswick St Belt',
       label: 'Title history',
-      description: 'A challenger belt that passes between clubs every time the holder is beaten.',
+      description: 'A reigning champion style linear title that passes between clubs every time the holder is beaten.',
       stat: (
         <Stat>
           {holderInfo ? (
