@@ -1,10 +1,8 @@
 name: Update worm cache
 
 on:
-  schedule:
-    # Fri/Sat/Sun/Mon at 04:00 AEST (18:00 UTC Thu/Fri/Sat/Sun)
-    # Runs March–October only (AFL season). Skips itself outside that window.
-    - cron: '0 18 * * 0,4,5,6'
+  # Scheduled refreshes now run on the home hub (deploy/hub/README.md).
+  # Kept as a manual fallback: Actions → Update worm cache → Run workflow.
   workflow_dispatch:
     inputs:
       year:
