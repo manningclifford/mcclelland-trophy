@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { historicalData, calculateLegacyPoints, calculateCombinedPercentage } from '../data/historical';
 import { getTeamInfo } from '../data/teams';
+import { getMcClellandStandings } from '../services/aflApi';
 import TeamLogo from './TeamLogo';
 
-function RuledHeading({ children, sub }) {
+const CURRENT_YEAR = new Date().getFullYear();
+
+export function RuledHeading({ children, sub }) {
   return (
     <div className="flex items-center gap-4 mb-6">
       <div className="h-px flex-1 bg-stone-200" />
@@ -70,8 +73,84 @@ function calculateAllTimeStats() {
   return { teamStats, years };
 }
 
+// Team key of the current season's live McClelland leader, or null until known.
+function useCurrentLeader() {
+  const [leaderKey, setLeaderKey] = useState(null);
+
+  useEffect(() => {
+    if (historicalData[CURRENT_YEAR]) return;
+    getMcClellandStandings(CURRENT_YEAR).then(({ standings }) => {
+      setLeaderKey(standings?.[0]?.team ?? null);
+    });
+  }, []);
+
+  return leaderKey;
+}
+
+// Winners by season, plus a card for the current season while it's undecided.
+export function TrophyHistory() {
+  const leaderKey = useCurrentLeader();
+  const years = Object.keys(historicalData).map(Number).sort();
+
+  const winnersByYear = years.map(year => {
+    const data = historicalData[year];
+    return { year, winner: data.winner, hypotheticalWinner: data.hypotheticalWinner, isOfficial: !!data.winner };
+  });
+
+  return (
+    <section>
+      <RuledHeading>Trophy History</RuledHeading>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {winnersByYear.map(({ year, winner, hypotheticalWinner, isOfficial }) => {
+          const displayWinner = winner || hypotheticalWinner;
+          const teamKey = displayWinner?.toLowerCase().replace(/\s+/g, '');
+          const teamInfo = teamKey ? getTeamInfo(teamKey) : null;
+
+          return (
+            <div
+              key={year}
+              className={`p-4 text-center border ${
+                isOfficial ? 'bg-stone-50 border-stone-400' : 'bg-white border-stone-200'
+              }`}
+            >
+              <div className="display-font text-2xl font-bold text-stone-800">{year}</div>
+              {teamInfo && (
+                <>
+                  <div className="flex justify-center mt-2">
+                    <TeamLogo teamKey={teamKey} size="md" />
+                  </div>
+                  <div className="mt-2 text-sm font-medium text-stone-700">{teamInfo.name}</div>
+                  <div className={`text-xs mt-1 ${isOfficial ? 'text-stone-500 font-semibold' : 'text-stone-400'}`}>
+                    {isOfficial ? 'Official' : 'Hypothetical'}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Current season: no winner yet, show who's leading */}
+        {!historicalData[CURRENT_YEAR] && (
+          <div className="p-4 text-center border border-dashed border-stone-300 bg-white">
+            <div className="display-font text-2xl font-bold text-stone-800">{CURRENT_YEAR}</div>
+            {leaderKey && (
+              <div className="flex justify-center mt-2">
+                <TeamLogo teamKey={leaderKey} size="md" />
+              </div>
+            )}
+            <div className="mt-2 text-sm font-medium text-stone-700">TBD</div>
+            {leaderKey && (
+              <div className="text-xs mt-1 text-stone-400">{getTeamInfo(leaderKey).name} leading</div>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function Summary() {
-  const { teamStats, years } = calculateAllTimeStats();
+  const { teamStats } = calculateAllTimeStats();
 
   const rankedTeams = Object.entries(teamStats)
     .map(([team, stats]) => ({ team, ...stats }))
@@ -82,54 +161,8 @@ export default function Summary() {
       return b.totalPoints - a.totalPoints;
     });
 
-  const winnersByYear = years.map(year => {
-    const data = historicalData[year];
-    return { year, winner: data.winner, hypotheticalWinner: data.hypotheticalWinner, isOfficial: !!data.winner };
-  });
-
   return (
     <div className="space-y-10">
-
-      {/* Introduction */}
-      <p className="text-stone-500 leading-relaxed">
-        Awarded annually since 2023 to the AFL club with the best combined record across both AFL and AFLW.
-        AFL wins earn 4 points, AFLW wins earn 8 points (reflecting the shorter season), and draws earn half.
-        Hypothetical winners are calculated back to 2017 when AFLW began.
-      </p>
-
-      {/* Trophy History */}
-      <section>
-        <RuledHeading>Trophy History</RuledHeading>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {winnersByYear.map(({ year, winner, hypotheticalWinner, isOfficial }) => {
-            const displayWinner = winner || hypotheticalWinner;
-            const teamKey = displayWinner?.toLowerCase().replace(/\s+/g, '');
-            const teamInfo = teamKey ? getTeamInfo(teamKey) : null;
-
-            return (
-              <div
-                key={year}
-                className={`p-4 text-center border ${
-                  isOfficial ? 'bg-stone-50 border-stone-400' : 'bg-white border-stone-200'
-                }`}
-              >
-                <div className="display-font text-2xl font-bold text-stone-800">{year}</div>
-                {teamInfo && (
-                  <>
-                    <div className="flex justify-center mt-2">
-                      <TeamLogo teamKey={teamKey} size="md" />
-                    </div>
-                    <div className="mt-2 text-sm font-medium text-stone-700">{teamInfo.name}</div>
-                    <div className={`text-xs mt-1 ${isOfficial ? 'text-stone-500 font-semibold' : 'text-stone-400'}`}>
-                      {isOfficial ? 'Official' : 'Hypothetical'}
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       {/* All-Time Leaderboard */}
       <section>

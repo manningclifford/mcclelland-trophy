@@ -3,7 +3,7 @@ import Header from './components/Header';
 import HomePage from './components/HomePage';
 import SeasonSelector from './components/SeasonSelector';
 import LadderTable from './components/LadderTable';
-import Summary from './components/Summary';
+import Summary, { RuledHeading, TrophyHistory } from './components/Summary';
 import GameEvolution from './components/GameEvolution';
 import WormSimilarity from './components/worm/WormSimilarity';
 import LinearTitle from './components/LinearTitle';
@@ -94,11 +94,20 @@ function App() {
 
       {route === '/mcclelland' && (
         <main className="max-w-6xl mx-auto py-8 px-4 space-y-10">
-          {/* Summary section */}
-          <Summary />
+          {/* Introduction */}
+          <p className="text-stone-500 leading-relaxed">
+            Awarded annually since 2023 to the AFL club with the best combined record across both AFL and AFLW.
+            AFL wins earn 4 points, AFLW wins earn 8 points (reflecting the shorter season), and draws earn half.
+            Hypothetical winners are calculated back to 2017 when AFLW began.
+          </p>
 
-          {/* Ladder section */}
+          <TrophyHistory />
+
+          {/* Ladder section — opens on the current season */}
           <section>
+            <RuledHeading sub={selectedYear === CURRENT_YEAR && !historicalWinner ? 'Season in progress' : undefined}>
+              {selectedYear} McClelland Trophy
+            </RuledHeading>
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <SeasonSelector
                 selectedYear={selectedYear}
@@ -123,6 +132,9 @@ function App() {
               onRefresh={handleRefresh}
             />
           </section>
+
+          {/* Summary section */}
+          <Summary />
         </main>
       )}
 
