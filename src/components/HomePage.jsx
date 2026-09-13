@@ -3,8 +3,11 @@ import { getLinearTitleMeta } from '../services/linearTitleApi';
 import { loadGameEvolution } from '../services/gameEvolutionApi';
 import { getSeasonTrend } from '../services/attendanceApi';
 import { getAlltimeTotals } from '../services/alltimeMensApi';
+import { getMcClellandStandings } from '../services/aflApi';
 import { getTeamInfo } from '../data/teams';
 import TeamLogo from './TeamLogo';
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 function Sparkline({ data, valueKey = 'avg', color = '#a8a29e', width = 80, height = 32 }) {
   if (!data || data.length < 2) return null;
@@ -38,12 +41,14 @@ export default function HomePage({ onNavigate }) {
   const [evolution, setEvolution] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [alltime, setAlltime] = useState(null);
+  const [mccLeaders, setMccLeaders] = useState(null);
 
   useEffect(() => {
     getLinearTitleMeta().then(setShield).catch(() => {});
     loadGameEvolution().then(d => setEvolution(d.seasons)).catch(() => {});
     getSeasonTrend().then(setAttendance).catch(() => {});
     getAlltimeTotals().then(setAlltime).catch(() => {});
+    getMcClellandStandings(CURRENT_YEAR).then(({ standings }) => setMccLeaders(standings?.slice(0, 3) ?? []));
   }, []);
 
   const holderInfo = shield ? getTeamInfo(shield.currentHolder) : null;
@@ -56,7 +61,6 @@ export default function HomePage({ onNavigate }) {
     : null;
   const alltimeLeader = alltime?.[0];
   const alltimeLeaderInfo = alltimeLeader ? getTeamInfo(alltimeLeader.team) : null;
-  const brisbaneInfo = getTeamInfo('brisbane');
 
   const cards = [
     {
@@ -108,11 +112,23 @@ export default function HomePage({ onNavigate }) {
       description: 'Combined AFL and AFLW standings. Which club dominates both competitions?',
       stat: (
         <Stat>
-          <TeamLogo teamKey="brisbane" size="sm" />
-          <div className="ml-3 min-w-0">
-            <p className="text-xs text-stone-400 uppercase tracking-widest">2025 winner</p>
-            <p className="font-bold text-stone-900">{brisbaneInfo.name} · 112 pts</p>
-            <p className="text-xs text-stone-500">AFL 48 · AFLW 64</p>
+          <div className="min-w-0 w-full">
+            <p className="text-xs text-stone-400 uppercase tracking-widest">{CURRENT_YEAR} leaders · points</p>
+            {mccLeaders?.length ? (
+              <div className="mt-1.5 flex items-center gap-3">
+                {mccLeaders.map((team) => (
+                  <div key={team.team} className="flex items-center gap-1.5 whitespace-nowrap" title={getTeamInfo(team.team).name}>
+                    <TeamLogo teamKey={team.team} size="xs" />
+                    <span className="font-bold text-stone-900">{getTeamInfo(team.team).abbr}</span>
+                    <span className="text-sm text-stone-500">{team.mcClellandPoints}</span>
+                  </div>
+                ))}
+              </div>
+            ) : mccLeaders ? (
+              <p className="text-xs text-stone-500 mt-1">Live standings unavailable</p>
+            ) : (
+              <div className="h-5 w-40 bg-stone-200 rounded animate-pulse mt-1" />
+            )}
           </div>
         </Stat>
       ),
