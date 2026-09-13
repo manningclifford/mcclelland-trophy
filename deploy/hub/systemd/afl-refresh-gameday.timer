@@ -1,0 +1,12 @@
+[Unit]
+Description=Tighter AFL refresh cadence on match days (Fri-Mon evenings)
+
+[Timer]
+# OPTIONAL — install alongside afl-refresh.timer for faster post-game updates.
+# Triggers the same afl-refresh.service at 18:15 / 20:15 / 22:15 on Fri-Mon.
+Unit=afl-refresh.service
+OnCalendar=Fri,Sat,Sun,Mon *-*-* 18,20,22:15:00
+Persistent=false
+
+[Install]
+WantedBy=timers.target

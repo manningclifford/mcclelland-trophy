@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly AFL data refresh
+
+[Timer]
+# 04:30 hub-local time, every day. In-season guard is inside refresh.sh.
+OnCalendar=*-*-* 04:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

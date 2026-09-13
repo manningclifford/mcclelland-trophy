@@ -1,0 +1,12 @@
+[Unit]
+Description=AFL data refresh pipeline (Sherrin Spreadsheets)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust %h/mcclelland-trophy if you cloned the repo elsewhere on the hub.
+WorkingDirectory=%h/mcclelland-trophy
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=%h/mcclelland-trophy/deploy/hub/refresh.sh
+TimeoutStartSec=1800
