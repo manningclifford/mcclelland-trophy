@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly AFL season simulation
+
+[Timer]
+# 05:00 — 30 min after the data refresh, so it simulates from fresh results.
+OnCalendar=*-*-* 05:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

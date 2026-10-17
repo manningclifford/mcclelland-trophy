@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly AFL worm-similarity full recompute
+
+[Timer]
+# Sundays 05:30 hub-local. Heavy O(n^2) job; weekly is plenty.
+OnCalendar=Sun *-*-* 05:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

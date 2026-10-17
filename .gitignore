@@ -32,3 +32,40 @@ yarn-error.log*
 server/cache.db
 # server/worm_cache.json  # Needed for Railway deployment
 server/node_modules/
+
+# --- portfolio baseline (gitify) ---
+.DS_Store
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.Rproj.user/
+.Rhistory
+renv/library/
+dist/
+build/
+.next/
+.vercel/
+.cache/
+*.log
+*.aux
+*.toc
+*.out
+*.nav
+*.snm
+# secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*token*.json
+*token*.rds
+*.strava_token*
+credentials*.json
+client_secret*.json
+service-account*.json
+*.p12
+.hub_key

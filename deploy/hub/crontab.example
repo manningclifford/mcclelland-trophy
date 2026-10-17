@@ -1,0 +1,24 @@
+# AFL "Sherrin Spreadsheets" hub pipeline — crontab alternative to systemd timers.
+# Simplest option: no `loginctl enable-linger`, no unit files. Install with:
+#     crontab -e
+# then paste the lines below (edit the path if you cloned elsewhere).
+#
+# Requires Vixie cron (Ubuntu default), which honours CRON_TZ.
+
+CRON_TZ=Australia/Melbourne
+REPO=/home/manning/mcclelland-trophy
+
+# Nightly data refresh (in-season guard is inside refresh.sh)
+30 4 * * *   $REPO/deploy/hub/refresh.sh       >> $HOME/afl-hub.log 2>&1
+
+# Optional tighter cadence on match days (Fri-Mon evenings)
+15 18,20,22 * * 5,6,0,1  $REPO/deploy/hub/refresh.sh >> $HOME/afl-hub.log 2>&1
+
+# Live ladders + shield, every 10 minutes (no-ops off-season)
+*/10 * * * *  $REPO/deploy/hub/run-live.sh      >> $HOME/afl-hub.log 2>&1
+
+# Nightly Monte Carlo season simulation (30 min after refresh)
+0 5 * * *     $REPO/deploy/hub/run-simulate.sh  >> $HOME/afl-hub.log 2>&1
+
+# Weekly worm-similarity full recompute (Sundays 05:30)
+30 5 * * 0    $REPO/deploy/hub/run-worms.sh     >> $HOME/afl-hub.log 2>&1

@@ -1,0 +1,11 @@
+[Unit]
+Description=AFL live ladder + shield poll (Sherrin Spreadsheets)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/mcclelland-trophy
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=%h/mcclelland-trophy/deploy/hub/run-live.sh
+TimeoutStartSec=300

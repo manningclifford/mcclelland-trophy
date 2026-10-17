@@ -1,0 +1,12 @@
+[Unit]
+Description=AFL Monte Carlo season simulation (Sherrin Spreadsheets)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/mcclelland-trophy
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Override sim count if desired, e.g. Environment=SIM_N=100000
+ExecStart=%h/mcclelland-trophy/deploy/hub/run-simulate.sh
+TimeoutStartSec=1800
